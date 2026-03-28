@@ -5,17 +5,26 @@ export async function GET(request: Request) {
   const blob =
     "https://cqx6bcixmo4ctoaz.private.blob.vercel-storage.com/ccc_8525.mp4";
 
-  const blobResult = await get(blob, { access: "private" });
+  try {
+    const blobResult = await get(blob, { access: "private" });
 
-  // streaming headers
-  const headers = new Headers();
-  headers.set("Content-Type", blobResult?.blob.contentType);
-  headers.set("X-Content-Type-Options", "nosniff");
-  headers.set("Cache-Control", "private, no-cache"); // Recommended for private content
+    if (!!blobResult) {
+      // streaming headers
+      const headers = new Headers();
+      headers.set("Content-Type", blobResult?.blob.contentType);
+      headers.set("X-Content-Type-Options", "nosniff");
+      headers.set("Cache-Control", "private, no-cache"); // Recommended for private content
 
-  // this is extremely slow and I don't know why
-  return new NextResponse(blobResult.stream, {
-    status: 200,
-    headers,
-  });
+      // this is extremely slow and I don't know why
+      return new NextResponse(blobResult.stream, {
+        status: 200,
+        headers,
+      });
+    } else
+      new NextResponse("err", {
+        status: 500,
+      });
+  } catch (error) {
+    console.error(error);
+  }
 }
