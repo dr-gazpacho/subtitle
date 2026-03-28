@@ -18,3 +18,8 @@ Chosing NextJS as framework for a few reasons:
 - FUTURE TO DO: if this works, could make this a little more flexible by assigning IDs to videos and fetching/streaming from larger file system, right now just hardcoded to one video
 - Update that the file is too big for git hub, exploring Vercel Blob storage - seems as though I can host video of city council meetings as they are offically public
 - Blob storage seems fine, but overall experience is SLOW - not sure this is the best. unable to manually advance playhead
+- Went over the limit for free self-hosting, going to try to host on youtube and use iframe
+
+## feat-youtube-pivot
+
+- Hit Vercel's storage limits, so trying to host the video elsewhere and get the video processessing handled out of the box. I think I can access timestamps with the iframe and move the playhead with something on vimeo or youtube, we'll find out
