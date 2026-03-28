@@ -23,3 +23,6 @@ Chosing NextJS as framework for a few reasons:
 ## feat-youtube-pivot
 
 - Hit Vercel's storage limits, so trying to host the video elsewhere and get the video processessing handled out of the box. I think I can access timestamps with the iframe and move the playhead with something on vimeo or youtube, we'll find out
+- Using a react/youtube libary to simplify interacting with the video - hardcoding a video id into the player, leaving a note re: future
+- Used some Gemini to build out interface for some props not fully exposed by the library
+- Generally updated some comments and notes, removed the code that would try and stream video from Vercel Blob
