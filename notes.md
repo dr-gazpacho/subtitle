@@ -11,6 +11,10 @@ Chosing NextJS as framework for a few reasons:
 
 **Development**
 
+## feat-video-playback
+
 - Read the docs to get a sense of where I am, have never worked with speechmatics/video/subtitles like this, I've only burned them into a short film with Blender
 - Planning to host on Vercel, used Gemini to get quick scaffolding for API endpoint to serve video
 - FUTURE TO DO: if this works, could make this a little more flexible by assigning IDs to videos and fetching/streaming from larger file system, right now just hardcoded to one video
+- Update that the file is too big for git hub, exploring Vercel Blob storage - seems as though I can host video of city council meetings as they are offically public
+- Blob storage seems fine, but overall experience is SLOW - not sure this is the best. unable to manually advance playhead
