@@ -9,7 +9,7 @@ export async function GET(request: Request) {
 
   // streaming headers
   const headers = new Headers();
-  headers.set("Content-Type", blobResult.blob.contentType);
+  headers.set("Content-Type", blobResult.contentType);
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("Cache-Control", "private, no-cache"); // Recommended for private content
 
