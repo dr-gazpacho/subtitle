@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import YouTube, { YouTubeProps } from "react-youtube";
-import { genericFetch } from "@/utils/clientUtils";
+import { genericFetch, getSyncTranscript } from "@/utils/clientUtils";
 import {
   SpeechmaticsBatchResponse,
   YouTubeOptions,
@@ -34,6 +34,8 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
 
       // Only set state if the result was successful
       if (response.success) {
+        const test = getSyncTranscript(response.data.transcript);
+        console.log({ test });
         setTranscript(response.data.transcript); // Access the nested data property
       } else {
         console.error(response.error);

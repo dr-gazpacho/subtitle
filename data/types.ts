@@ -39,9 +39,9 @@ export interface WordResult {
   alternatives: Array<{
     content: string; // The word text
     confidence: number;
+    language?: string;
+    speaker?: string;
   }>;
-  speaker?: string; // Present if diarization is "speaker"
-  channel?: string; // Present if diarization is "channel"
 }
 
 export interface SpeakerChangeResult {
@@ -107,3 +107,8 @@ export interface TranscriptDetails {
   transcript: SpeechmaticsBatchResponse | null; // Matches your logic (Response OR Error string)
   createdAt: string;
 }
+
+// Generic interface for genericFetch
+export type Result<T> =
+  | { success: true; data: T }
+  | { success: false; error: Error };
