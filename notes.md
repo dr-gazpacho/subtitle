@@ -33,3 +33,11 @@ Chosing NextJS as framework for a few reasons:
 - set up API endpoint to fetch json from the file system
 - will use HTTP methods to determine whether we update speaker name or just fetch
 - set up a generic fetch method for the frontend to use
+
+## feat-sync
+
+- might be throw away code, going to try to implement something where I can just correlate the playhead on the video with a given word from the transcript
+- adding a small `tsc` command to run so I can catch more transpilation errors as I work
+- the nested async in the useEffect felt gross, did some reading and switched to tanstack router, seems popular amongst next power users
+- added a pretty brutal handler for the unformatted transcript - set a polling loop to get current time off the player, loop through words and get index of word who's start and end time wraps the current time from the player
+- switching to tanstack router brought in some hydration error (server DOM was different from client DOM) -> added "dynamic" import for YouTubePlayer and stopped it from rendering on server
