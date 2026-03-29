@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import YouTubePlayer from "./YouTube";
+import YouTubePlayer from "./YouTubePlayer";
 
 // In a perfect world, this is not hosted on youtube and we've implemented a more robust system to say...
 // Maybe display a list of thumbnails/videos in some sort of library where we can dynamically select a video on demand

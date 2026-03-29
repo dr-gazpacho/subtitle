@@ -26,3 +26,10 @@ Chosing NextJS as framework for a few reasons:
 - Using a react/youtube libary to simplify interacting with the video - hardcoding a video id into the player, leaving a note re: future
 - Used some Gemini to build out interface for some props not fully exposed by the library
 - Generally updated some comments and notes, removed the code that would try and stream video from Vercel Blob
+
+## feat-fetch-transcript
+
+- much less unknown than the video streaming
+- set up API endpoint to fetch json from the file system
+- will use HTTP methods to determine whether we update speaker name or just fetch
+- set up a generic fetch method for the frontend to use
