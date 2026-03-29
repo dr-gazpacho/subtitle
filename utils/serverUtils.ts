@@ -8,16 +8,16 @@ import path from "path";
  * @param videoId unique string to correlate video to transcript, currently just using the YouTube id
  * @returns null or the speechmatics transcript object
  */
-export const getTranscript = async (
-  videoId: string,
-): SpeechmaticsBatchResponse | null => {
+export const getTranscript = async <T>(videoId: string): Promise<T | null> => {
   try {
     const filePath = path.join(process.cwd(), `data/${videoId}.json`);
 
     try {
       const fileContents = await fs.readFile(filePath, "utf8");
       return JSON.parse(fileContents);
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      // stackoverflow notes this is the interface to use for Node errors
+      const error = err as NodeJS.ErrnoException;
       // minimal handle of "no transcript in file system" - but a hypothetically realistic scenario
       if (error.code === "ENOENT") {
         console.warn(`Transcript not found for ID: ${videoId}`);
@@ -28,10 +28,9 @@ export const getTranscript = async (
       console.error("FileSystem Error:", error);
       throw new Error("Internal Server Error reading transcript");
     }
-
-    return JSON.parse(fileContents);
-  } catch (error) {
-    throw new Error({ message: "Missing videoId from request", error });
+  } catch (err: unknown) {
+    const error = err as NodeJS.ErrnoException;
+    throw new Error("Missing videoId from request", { cause: error });
     return null;
   }
 };

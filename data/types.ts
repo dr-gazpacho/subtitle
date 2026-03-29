@@ -89,3 +89,15 @@ export interface YouTubeOptions {
     widget_referrer?: string;
   };
 }
+
+export interface AppError {
+  message: string;
+  status?: number;
+  code?: string;
+}
+
+export interface Transcript {
+  success: boolean;
+  data?: SpeechmaticsBatchResponse;
+  error: AppError;
+}

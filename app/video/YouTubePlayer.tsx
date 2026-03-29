@@ -3,7 +3,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import YouTube, { YouTubeProps } from "react-youtube";
 import { genericFetch } from "@/utils/clientUtils";
-import { SpeechmaticsBatchResponse, YouTubeOptions } from "@/data/types";
+import {
+  SpeechmaticsBatchResponse,
+  YouTubeOptions,
+  Transcript,
+} from "@/data/types";
 
 interface YouTubePlayerProps {
   videoId: string;
@@ -11,22 +15,31 @@ interface YouTubePlayerProps {
 
 const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
   // fetch the transcript
-  const [transcript, setTranscript] = useState(null);
+  const [transcript, setTranscript] =
+    useState<SpeechmaticsBatchResponse | null>(null);
 
   // fetch video id on page load and get transcript
   // TO DO - parse/format data
   useEffect(() => {
     const getTranscript = async () => {
-      const data = await genericFetch<SpeechmaticsBatchResponse>(
+      //this isn't perfectly interpreting result
+      const data = await genericFetch<Transcript>(
         `/api/transcript/${videoId}`,
         {
           method: "GET",
         },
       );
-      setTranscript(data);
+
+      // Only set state if the result was successful
+      if (data.success) {
+        setTranscript(data.data); // Access the nested data property
+      } else {
+        console.error(data.error);
+        // Optional: handle error state here
+      }
     };
 
-    getTranscript();
+    if (videoId) getTranscript();
   }, [videoId]);
 
   // can get time from the ref, but there is no explicit playing event or "time" event to hook into, initialize at 0

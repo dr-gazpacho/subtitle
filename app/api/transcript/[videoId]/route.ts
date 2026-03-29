@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getTranscript } from "@/utils/serverUtils";
+import { SpeechmaticsBatchResponse } from "@/data/types";
 
 export async function GET(
   request: Request,
@@ -13,7 +14,8 @@ export async function GET(
       throw new Error("Missing videoId from request");
     }
 
-    const transcript = await getTranscript(videoId);
+    // transcript variable will explicitly be null if no transcript exists in file system
+    const transcript = await getTranscript<SpeechmaticsBatchResponse>(videoId);
 
     if (transcript) {
       return NextResponse.json({
@@ -28,15 +30,14 @@ export async function GET(
         createdAt: new Date().toISOString(),
       });
     }
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       {
         id: null,
-        transcript: `An unknown error occured`,
+        transcript: `An unknown error occured}`,
         createdAt: new Date().toISOString(),
       },
       { status: 404 }, // Recommended to return a proper status code
     );
-    throw new Error({ message: "Uknown error", error });
   }
 }
