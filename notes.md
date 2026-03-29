@@ -33,3 +33,7 @@ Chosing NextJS as framework for a few reasons:
 - set up API endpoint to fetch json from the file system
 - will use HTTP methods to determine whether we update speaker name or just fetch
 - set up a generic fetch method for the frontend to use
+
+## feat-sync
+
+- might be throw away code, going to try to implement something where I can just correlate the playhead on the video with a given word from the transcript

@@ -22,9 +22,9 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
   // TO DO - parse/format data
   useEffect(() => {
     const getTranscript = async () => {
-      // this doesnt quite return the type TranscriptDetails
+      // this doesnt quite return the type TranscriptDetails -
       // genericFetch uses the generic T to type the data on the response object
-      // whole response is TranscriptApiResponse, where TranscriptDetails is mapped to data.data
+      // whole response is TranscriptApiResponse, where TranscriptDetails is mapped to response.data
       const response = await genericFetch<TranscriptDetails>(
         `/api/transcript/${videoId}`,
         {
