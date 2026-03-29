@@ -1,58 +1,26 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import YouTube, { YouTubeProps } from "react-youtube";
 import { genericFetch, getSyncTranscript } from "@/utils/clientUtils";
-import {
-  SpeechmaticsBatchResponse,
-  YouTubeOptions,
-  TranscriptDetails,
-} from "@/data/types";
+import { useQuery } from "@tanstack/react-query";
+import { YouTubeOptions, TranscriptDetails } from "@/data/types";
 
 interface YouTubePlayerProps {
   videoId: string;
 }
 
 const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
-  // fetch the transcript
-  const [transcript, setTranscript] =
-    useState<SpeechmaticsBatchResponse | null>(null);
+  // ====== STATE/HOOKS ======
 
-  // fetch video id on page load and get transcript
-  // TO DO - parse/format data
-  useEffect(() => {
-    const getTranscript = async () => {
-      // this doesnt quite return the type TranscriptDetails -
-      // genericFetch uses the generic T to type the data on the response object
-      // whole response is TranscriptApiResponse, where TranscriptDetails is mapped to response.data
-      const response = await genericFetch<TranscriptDetails>(
-        `/api/transcript/${videoId}`,
-        {
-          method: "GET",
-        },
-      );
-
-      // Only set state if the result was successful
-      if (response.success) {
-        const test = getSyncTranscript(response.data.transcript);
-        console.log({ test });
-        setTranscript(response.data.transcript); // Access the nested data property
-      } else {
-        console.error(response.error);
-        // Optional: handle error state here
-      }
-    };
-
-    if (videoId) getTranscript();
-  }, [videoId]);
-
+  const [currentWord, setCurrentWord] = useState("");
   // can get time from the ref, but there is no explicit playing event or "time" event to hook into, initialize at 0
   const [currentTime, setCurrentTime] = useState<number>(0);
-
   // ref as YT.Player - available globally via @types/youtube
   const playerRef = useRef<YT.Player | null>(null);
-
   // explictly define this onReady method to fit with the library's props
+
+  // ====== EVENT HANDLERS ======
   const onReady: YouTubeProps["onReady"] = (event) => {
     // console.log("Player is ready:", event.target);
     playerRef.current = event.target;
@@ -66,6 +34,8 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
     }
   };
 
+  // ====== DATA ======
+
   // library types these "optional props" as  YouTube["opts"] which resolves to any, I do not love this
   // used a little Gemini to define a complete interface for this - hoping for accuracy given the popularity of the library
   const optionalProps: YouTubeOptions = {
@@ -75,6 +45,33 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
       autoplay: 0,
     },
   };
+
+  const {
+    data: transcript, // noted in the return statement, the hook is returning response.data.transcript made available through this destructuring as "transcript"
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    // Unique key for caching; refetches automatically if videoId changes - unlikey scenario but
+    queryKey: ["transcript", videoId],
+
+    queryFn: async () => {
+      const response = await genericFetch<TranscriptDetails>(
+        `/api/transcript/${videoId}`,
+        { method: "GET" },
+      );
+
+      if (!response.success) {
+        throw response.error;
+      }
+      return response.data.transcript;
+    },
+
+    // only run the query if videoId is truthy
+    enabled: !!videoId,
+  });
+
+  const formatted = getSyncTranscript(transcript);
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -88,7 +85,12 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
           Get Current Timestamp
         </button>
       </div>
-      {JSON.stringify(transcript)}
+      {isLoading && <p>Loading transcript...</p>}
+      {isError && <p>Error: {(error as Error).message}</p>}
+      {!!formatted &&
+        formatted?.map((item) => {
+          return <div key={item.word}>{item.word}</div>;
+        })}
     </div>
   );
 };

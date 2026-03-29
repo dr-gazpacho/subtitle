@@ -38,3 +38,4 @@ Chosing NextJS as framework for a few reasons:
 
 - might be throw away code, going to try to implement something where I can just correlate the playhead on the video with a given word from the transcript
 - adding a small `tsc` command to run so I can catch more transpilation errors as I work
+- the nested async in the useEffect felt gross, did some reading and switched to tanstack router, seems popular amongst next power users
