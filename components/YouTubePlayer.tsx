@@ -30,7 +30,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
         `/api/transcript/${videoId}`,
         { method: "GET" },
       );
-      if (!response.success) throw new Error(response.error);
+      if (!response.success) throw new Error(response.error.toString());
       return response.data.transcript;
     },
     enabled: !!videoId,
@@ -40,8 +40,11 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
   const words = transcript ? getSyncTranscript(transcript) : [];
 
   // ====== SYNC LOGIC ======
+
+  // effectively run a polling loop which looks for the current time of the video and correlates that to the transcript
   const startTracking = () => {
-    if (intervalRef.current) return;
+    //if the timer is running or there are no words, don't start a(nother) timer
+    if (intervalRef.current || !words) return;
 
     intervalRef.current = setInterval(() => {
       if (playerRef.current) {
@@ -60,6 +63,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
     }, 100);
   };
 
+  // when video stops playing, clear the interval
   const stopTracking = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -74,6 +78,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
 
   // ====== YOUTUBE EVENTS ======
   const onReady: YouTubeProps["onReady"] = (event) => {
+    // effectively capturing the controller for the external video player
     playerRef.current = event.target;
   };
 
@@ -114,22 +119,23 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
       )}
 
       <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto p-4 border">
-        {words.map((item, idx) => (
-          <span
-            key={`${item.word}-${idx}`}
-            className={`transition-colors cursor-pointer rounded px-1 ${
-              activeIndex === idx
-                ? "bg-yellow-300 font-bold"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-            onClick={() => {
-              // takes the timestamp from the transcipt and forces the player to jump to it on click
-              playerRef.current?.seekTo(item.start, true);
-            }}
-          >
-            {item.word}
-          </span>
-        ))}
+        {!!words &&
+          words.map((item, idx) => (
+            <span
+              key={`${item.word}-${idx}`}
+              className={`transition-colors cursor-pointer rounded px-1 ${
+                activeIndex === idx
+                  ? "bg-yellow-300 font-bold"
+                  : "text-gray-600 hover:bg-gray-100"
+              }`}
+              onClick={() => {
+                // takes the timestamp from the transcipt and forces the player to jump to it on click
+                playerRef.current?.seekTo(item.start, true);
+              }}
+            >
+              {item.word}
+            </span>
+          ))}
       </div>
     </div>
   );

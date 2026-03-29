@@ -1,14 +1,25 @@
 "use client";
 
 import React from "react";
-import YouTubePlayer from "./YouTubePlayer";
+import dynamic from "next/dynamic";
 
-// In a perfect world, this is not hosted on youtube and we've implemented a more robust system to say...
-// Maybe display a list of thumbnails/videos in some sort of library where we can dynamically select a video on demand
-// onVideoSelect ship the captioning to the client and stream the video - sync the two at 0
+// was getting some hydration errors - server rendered version of the app had mismatch from client
+// afaik this tells Next.js: "do NOT render this on the server; just render the loading component until the browser takes over."
+const YouTubePlayer = dynamic(() => import("@/components/YouTubePlayer"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex flex-col items-center gap-4">
+      <p>Loading...</p>
+    </div>
+  ),
+});
 
-const VideoPlayer = () => {
-  return <YouTubePlayer videoId={"yp1vkTW3fxI"} />;
-};
+export default function VideoPage() {
+  const videoId = "yp1vkTW3fxI"; // or from params
 
-export default VideoPlayer;
+  return (
+    <main>
+      <YouTubePlayer videoId={videoId} />
+    </main>
+  );
+}
