@@ -6,7 +6,7 @@ import { genericFetch } from "@/utils/clientUtils";
 import {
   SpeechmaticsBatchResponse,
   YouTubeOptions,
-  Transcript,
+  TranscriptDetails,
 } from "@/data/types";
 
 interface YouTubePlayerProps {
@@ -22,8 +22,10 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
   // TO DO - parse/format data
   useEffect(() => {
     const getTranscript = async () => {
-      //this isn't perfectly interpreting result
-      const data = await genericFetch<Transcript>(
+      // this doesnt quite return the type TranscriptDetails
+      // genericFetch uses the generic T to type the data on the response object
+      // whole response is TranscriptApiResponse, where TranscriptDetails is mapped to data.data
+      const response = await genericFetch<TranscriptDetails>(
         `/api/transcript/${videoId}`,
         {
           method: "GET",
@@ -31,10 +33,10 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
       );
 
       // Only set state if the result was successful
-      if (data.success) {
-        setTranscript(data.data); // Access the nested data property
+      if (response.success) {
+        setTranscript(response.data.transcript); // Access the nested data property
       } else {
-        console.error(data.error);
+        console.error(response.error);
         // Optional: handle error state here
       }
     };
@@ -50,7 +52,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
 
   // explictly define this onReady method to fit with the library's props
   const onReady: YouTubeProps["onReady"] = (event) => {
-    console.log("Player is ready:", event.target);
+    // console.log("Player is ready:", event.target);
     playerRef.current = event.target;
   };
 

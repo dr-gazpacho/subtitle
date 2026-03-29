@@ -96,8 +96,14 @@ export interface AppError {
   code?: string;
 }
 
-export interface Transcript {
+export interface TranscriptApiResponse {
   success: boolean;
-  data?: SpeechmaticsBatchResponse;
+  data?: TranscriptApiResponse;
   error: AppError;
+}
+
+export interface TranscriptDetails {
+  id: string | null;
+  transcript: SpeechmaticsBatchResponse | null; // Matches your logic (Response OR Error string)
+  createdAt: string;
 }
