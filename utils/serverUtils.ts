@@ -2,6 +2,12 @@ import { SpeechmaticsBatchResponse } from "@/data/types";
 import { promises as fs } from "fs";
 import path from "path";
 
+/**
+ * method to fetch a transcript from the file system - granted there is only one for this exercise,
+ * but the general hypopthetical this imagines is that video and transcripts are stored separate and we can correlate them somehow
+ * @param videoId unique string to correlate video to transcript, currently just using the YouTube id
+ * @returns null or the speechmatics transcript object
+ */
 export const getTranscript = async (
   videoId: string,
 ): SpeechmaticsBatchResponse | null => {

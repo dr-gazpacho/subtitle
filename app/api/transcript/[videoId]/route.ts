@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-
-import { getTranscript } from "./utils";
+import { getTranscript } from "@/utils/serverUtils";
 
 export async function GET(
   request: Request,
