@@ -12,8 +12,6 @@ interface YouTubePlayerProps {
 }
 
 const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
-  const [activeWord, setActiveWord] = useState<string>("");
-  const [currentTime, setCurrentTime] = useState<number>(0);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
   const playerRef = useRef<YT.Player | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -50,15 +48,12 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
     intervalRef.current = setInterval(() => {
       if (playerRef.current) {
         const time = playerRef.current.getCurrentTime();
-        setCurrentTime(time);
 
         // Find the index of the word where the time falls between start and end
         const index = words.findIndex((w) => time >= w.start && time <= w.end);
 
         if (index !== -1 && index !== activeIndex) {
           setActiveIndex(index);
-          console.log("Active Word:", words[index].word);
-          setActiveWord(words[index].word);
         }
       }
     }, 100);
