@@ -1,4 +1,8 @@
-import { Result, SpeechmaticsBatchResponse, WordResult } from "@/data/types";
+import {
+  Result,
+  SpeechmaticsBatchResponse,
+  SimplifiedTranscript,
+} from "@/data/types";
 /**
  *
  * @param url - plan to use only one URL then using different HTTP actions
@@ -36,18 +40,84 @@ export const genericFetch = async <T>(
   }
 };
 
-export const getSyncTranscript = (data: SpeechmaticsBatchResponse | null) => {
-  if (!data) {
-    // let the null pass through and don't process - handle null outside the function
-    return data;
-  } else {
-    return data.results
-      .filter((item): item is WordResult => item.type === "word")
-      .map((item) => ({
-        word: item.alternatives[0].content, // TO DO - handle alternatives.length > 1; these edge cases are not included in dataset, solution deferred
+/**
+ * maps through speechmatics transcript, simplifies dataset
+ * @param data Speechmatics transcript
+ * @returns simplfied dataset that contains speaker name, timestamps, and word
+ */
+export const simplifyTranscript = (data: SpeechmaticsBatchResponse | null) => {
+  if (!data) return null;
+
+  const words: SimplifiedTranscript[] = [];
+  const results = data.results;
+
+  for (let i = 0; i < results.length; i++) {
+    const item = results[i];
+
+    if (item.type === "word") {
+      let content = item.alternatives[0].content; // brittle but will work for the dataset- hypothetical do to is nested loop and extract "highest confidence" result
+
+      // need to look ahead to identify if the next item is punctuation and then attach it to the previous word
+      const nextItem = results[i + 1];
+      if (nextItem && nextItem.type === "punctuation") {
+        content += nextItem.alternatives[0].content;
+        i++; // skip ahead if we attach punctionation
+      }
+
+      words.push({
+        word: content,
         start: item.start_time,
         end: item.end_time,
-        speaker: item.alternatives[0].speaker ?? "",
-      }));
+        speaker: item.alternatives[0].speaker ?? "Unknown",
+      });
+    }
   }
+  return words;
+};
+
+/**
+ * breaks continuous array or WordResult into array of objects. Each object represents a "speaking turn" or a continuous sentence/statement from a discrete speaker
+ * each object contains KV pair for speaker name, then array of WordResult which comprise their current "speaking turn"
+ * @param words represents the result of simplifyTranscript
+ * @returns array of objects, each object in the array contains a speaker's name and an array of WordResult
+ */
+interface TranscriptTurn {
+  speaker: string;
+  words: (SimplifiedTranscript & { globalIndex: number })[];
+}
+
+/**
+ * helper function to group "speaking turns" - "speaking turn" defined as a discrete unit of unterupted speech by a unique speaker at least one word long
+ * e.g. He said, "Dearly beloved we are gathered here today to get through this thing called life" And then she said, "hooray" creates two "speaking turns" worth of data
+ * @param words the simplified transcript
+ * @returns a version of the trascript formatted into "speaking turns" grouped under a given speaker's entire discrete bundle of speech, keeps SimplifiedTranscript structure
+ */
+export const formatTranscript = (words: SimplifiedTranscript[] | null) => {
+  if (!words || words.length === 0) return [];
+
+  const turns: TranscriptTurn[] = [];
+
+  let currentTurn: TranscriptTurn = {
+    speaker: words[0].speaker,
+    words: [],
+  };
+
+  words.forEach((word, index) => {
+    // this is a little ugly, but will keep the original index linked to how the word is reindexed in a new array with the new format
+    // then, when the world is clicked, we can use this to target auto scroll and highlighting the specific word spoken with the existing "active index"
+    const wordWithIndex = { ...word, globalIndex: index };
+
+    if (word.speaker !== currentTurn.speaker) {
+      // push the now grouped "speaking turn" into the turns array
+      turns.push(currentTurn);
+      // start a new "speaking turn" with the speaker of the new word
+      currentTurn = { speaker: word.speaker, words: [wordWithIndex] };
+    } else {
+      currentTurn.words.push(wordWithIndex);
+    }
+  });
+
+  // pushes the last unprocessed word in before returning nested format
+  turns.push(currentTurn);
+  return turns;
 };

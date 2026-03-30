@@ -33,7 +33,7 @@ export interface SpeechmaticsBatchResponse {
 
 // Result item types
 export interface WordResult {
-  type: "word";
+  type: "word" | "punctuation";
   start_time: number;
   end_time: number;
   alternatives: Array<{
@@ -112,3 +112,10 @@ export interface TranscriptDetails {
 export type Result<T> =
   | { success: true; data: T }
   | { success: false; error: Error };
+
+export interface SimplifiedTranscript {
+  word: string;
+  start: number;
+  end: number;
+  speaker: string;
+}
