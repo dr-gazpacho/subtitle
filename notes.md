@@ -48,3 +48,15 @@ Chosing NextJS as framework for a few reasons:
 - updated method that simplifieds transcript data - shout out to Robert Nystrom and his notes on using lookahead during tokenization, implemented a pretty informal verion to map punctuation
 - note for future me: skipped to end of video (multiple, simultanous voices say "Aye") and seems that the transcript separates them into discrete voices at discrete times - not sure what the right strategy is: render transcript completely and allow small edge cases like this? Or dig in and try to handle "simultanous speech"
 - add a nested formatter and render the transcript a little differently - groups things by "speaking turn" but keeps a connection back to the old index/lookup strategy
+
+## feat-scroll
+
+- just adding "scroll into view" logic - will defer on implementing search, will need to "disable scroll" while searching
+- scroll isn't perfect programatically but I think it works - I'm scrolling on the basis of index, so the viewport will scroll to each word even when they're on the same line. You cannot see the scroll, but programatically it is probably happening. If it works like I think it works. it's a trivial amount of wasted computation, but still wasted
+
+## future
+
+[ ] keyword/phrase search
+[ ] update speaker tag
+[ ] stretch - move components, only need default page and an "about" page (maybe a better name is "instructions" or "how to")
+[ ] stretch - bookmark a timestamp "onWordClick"
