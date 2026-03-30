@@ -108,31 +108,50 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <YouTube
-        videoId={videoId}
-        opts={opts}
-        onReady={onReady}
-        onStateChange={onStateChange}
-      />
+    /* 
+     - max-w-7xl: caps the width so it doesn't get too wide on ultrawide monitors.
+     - items-center: centers them vertically (on top of each other) for mobile.
+     - lg:flex-row: flips them side-by-side on desktop.
+     - lg:items-start: aligns them to the top of the container on desktop.
+  */
+    <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center gap-8 p-6 max-w-7xl mx-auto w-full">
+      {/* video wrapper - sticky keeps it in view on desktop while scrolling transcript */}
+      <div className="lg:sticky lg:top-8 w-fit flex-shrink-0 shadow-lg rounded-xl overflow-hidden border border-slate-200">
+        <YouTube
+          videoId={videoId}
+          opts={opts}
+          onReady={onReady}
+          onStateChange={onStateChange}
+        />
+      </div>
 
-      {/* <div className="text-center p-4 border rounded bg-slate-50 w-full max-w-2xl">
-        <p className="text-sm text-gray-500">Time: {currentTime.toFixed(2)}s</p>
-        <p className="text-2xl font-bold text-blue-600 h-8">
-          {activeWord || "..."}
-        </p>
-      </div> */}
+      {/* transcript wrapper grows to fill space but stays readable */}
+      <div className="w-full max-w-2xl flex-1 h-full">
+        {isLoading && (
+          <div className="h-[400px] flex items-center justify-center bg-slate-50 rounded-xl border border-dashed border-slate-300">
+            <p className="text-slate-500 animate-pulse">
+              Loading transcript...
+            </p>
+          </div>
+        )}
 
-      {isLoading && <p>Loading transcript...</p>}
-      {isError && (
-        <p className="text-red-500">Error: {(error as Error).message}</p>
-      )}
+        {isError && (
+          <div className="p-4 bg-red-50 text-red-600 rounded-xl border border-red-100">
+            Error: {(error as Error).message}
+          </div>
+        )}
 
-      <TranscriptView
-        words={words}
-        activeIndex={activeIndex}
-        onWordClick={onWordClick}
-      />
+        {/* render only if we have words to show */}
+        {!isLoading && !isError && (
+          <div className="h-full">
+            <TranscriptView
+              words={words}
+              activeIndex={activeIndex}
+              onWordClick={onWordClick}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
