@@ -46,3 +46,5 @@ Chosing NextJS as framework for a few reasons:
 
 - right now everything word of the transcript is chucked onto the DOM in a giant pile with no puntuation, formatting, or concept of the speakers name, I'm going to try to preserve this current functionality in a nicer format. goal is to chunk text together per chunk from a given speaker (with punctuation)
 - updated method that simplifieds transcript data - shout out to Robert Nystrom and his notes on using lookahead during tokenization, implemented a pretty informal verion to map punctuation
+- note for future me: skipped to end of video (multiple, simultanous voices say "Aye") and seems that the transcript separates them into discrete voices at discrete times - not sure what the right strategy is: render transcript completely and allow small edge cases like this? Or dig in and try to handle "simultanous speech"
+- add a nested formatter and render the transcript a little differently - groups things by "speaking turn" but keeps a connection back to the old index/lookup strategy

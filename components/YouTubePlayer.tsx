@@ -2,9 +2,10 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import YouTube, { YouTubeProps } from "react-youtube";
-import { genericFetch, getSyncTranscript } from "@/utils/clientUtils";
+import { genericFetch, simplifyTranscript } from "@/utils/clientUtils";
 import { useQuery } from "@tanstack/react-query";
 import { YouTubeOptions, TranscriptDetails } from "@/data/types";
+import TranscriptView from "./TranscriptView";
 
 interface YouTubePlayerProps {
   videoId: string;
@@ -37,7 +38,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
   });
 
   // Transform data for syncing
-  const words = transcript ? getSyncTranscript(transcript) : [];
+  const words = transcript ? simplifyTranscript(transcript) : [];
 
   // ====== SYNC LOGIC ======
 
@@ -82,6 +83,11 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
     playerRef.current = event.target;
   };
 
+  /**
+   *
+   * @param event ENUM representing video player state
+   * returns void, side effect only
+   */
   const onStateChange: YouTubeProps["onStateChange"] = (event) => {
     // YT.PlayerState.PLAYING = 1
     if (event.data === 1) {
@@ -89,6 +95,15 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
     } else {
       stopTracking();
     }
+  };
+
+  /**
+   * onClick of a given item in the transcript, send video playhead to a given time
+   * @param wordStartTime number that represents the start time of a given word in the transcript
+   * return void, side effect only
+   */
+  const onWordClick = (wordStartTime: number) => {
+    playerRef.current?.seekTo(wordStartTime, true);
   };
 
   const opts: YouTubeOptions = {
@@ -106,37 +121,23 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
         onStateChange={onStateChange}
       />
 
-      <div className="text-center p-4 border rounded bg-slate-50 w-full max-w-2xl">
+      {/* <div className="text-center p-4 border rounded bg-slate-50 w-full max-w-2xl">
         <p className="text-sm text-gray-500">Time: {currentTime.toFixed(2)}s</p>
         <p className="text-2xl font-bold text-blue-600 h-8">
           {activeWord || "..."}
         </p>
-      </div>
+      </div> */}
 
       {isLoading && <p>Loading transcript...</p>}
       {isError && (
         <p className="text-red-500">Error: {(error as Error).message}</p>
       )}
 
-      <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto p-4 border">
-        {!!words &&
-          words.map((item, idx) => (
-            <span
-              key={`${item.word}-${idx}`}
-              className={`transition-colors cursor-pointer rounded px-1 ${
-                activeIndex === idx
-                  ? "bg-yellow-300 font-bold"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-              onClick={() => {
-                // takes the timestamp from the transcipt and forces the player to jump to it on click
-                playerRef.current?.seekTo(item.start, true);
-              }}
-            >
-              {item.word}
-            </span>
-          ))}
-      </div>
+      <TranscriptView
+        words={words}
+        activeIndex={activeIndex}
+        onWordClick={onWordClick}
+      />
     </div>
   );
 };

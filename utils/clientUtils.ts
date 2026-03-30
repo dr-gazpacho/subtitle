@@ -1,4 +1,8 @@
-import { Result, SpeechmaticsBatchResponse, WordResult } from "@/data/types";
+import {
+  Result,
+  SpeechmaticsBatchResponse,
+  SimplifiedTranscript,
+} from "@/data/types";
 /**
  *
  * @param url - plan to use only one URL then using different HTTP actions
@@ -41,10 +45,10 @@ export const genericFetch = async <T>(
  * @param data Speechmatics transcript
  * @returns simplfied dataset that contains speaker name, timestamps, and word
  */
-export const getSyncTranscript = (data: SpeechmaticsBatchResponse | null) => {
+export const simplifyTranscript = (data: SpeechmaticsBatchResponse | null) => {
   if (!data) return null;
 
-  const words: WordResult[] = [];
+  const words: SimplifiedTranscript[] = [];
   const results = data.results;
 
   for (let i = 0; i < results.length; i++) {
@@ -69,4 +73,51 @@ export const getSyncTranscript = (data: SpeechmaticsBatchResponse | null) => {
     }
   }
   return words;
+};
+
+/**
+ * breaks continuous array or WordResult into array of objects. Each object represents a "speaking turn" or a continuous sentence/statement from a discrete speaker
+ * each object contains KV pair for speaker name, then array of WordResult which comprise their current "speaking turn"
+ * @param words represents the result of simplifyTranscript
+ * @returns array of objects, each object in the array contains a speaker's name and an array of WordResult
+ */
+interface TranscriptTurn {
+  speaker: string;
+  words: (SimplifiedTranscript & { globalIndex: number })[];
+}
+
+/**
+ * helper function to group "speaking turns" - "speaking turn" defined as a discrete unit of unterupted speech by a unique speaker at least one word long
+ * e.g. He said, "Dearly beloved we are gathered here today to get through this thing called life" And then she said, "hooray" creates two "speaking turns" worth of data
+ * @param words the simplified transcript
+ * @returns a version of the trascript formatted into "speaking turns" grouped under a given speaker's entire discrete bundle of speech, keeps SimplifiedTranscript structure
+ */
+export const formatTranscript = (words: SimplifiedTranscript[] | null) => {
+  if (!words || words.length === 0) return [];
+
+  const turns: TranscriptTurn[] = [];
+
+  let currentTurn: TranscriptTurn = {
+    speaker: words[0].speaker,
+    words: [],
+  };
+
+  words.forEach((word, index) => {
+    // this is a little ugly, but will keep the original index linked to how the word is reindexed in a new array with the new format
+    // then, when the world is clicked, we can use this to target auto scroll and highlighting the specific word spoken with the existing "active index"
+    const wordWithIndex = { ...word, globalIndex: index };
+
+    if (word.speaker !== currentTurn.speaker) {
+      // push the now grouped "speaking turn" into the turns array
+      turns.push(currentTurn);
+      // start a new "speaking turn" with the speaker of the new word
+      currentTurn = { speaker: word.speaker, words: [wordWithIndex] };
+    } else {
+      currentTurn.words.push(wordWithIndex);
+    }
+  });
+
+  // pushes the last unprocessed word in before returning nested format
+  turns.push(currentTurn);
+  return turns;
 };
