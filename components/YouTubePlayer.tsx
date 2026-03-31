@@ -3,8 +3,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import YouTube, { YouTubeProps } from "react-youtube";
 import { genericFetch, simplifyTranscript } from "@/utils/clientUtils";
-import { useQuery } from "@tanstack/react-query";
-import { YouTubeOptions, TranscriptDetails } from "@/data/types";
+import {
+  YouTubeOptions,
+  TranscriptDetails,
+  SpeechmaticsBatchResponse,
+} from "@/data/types";
 import TranscriptView from "./TranscriptView";
 import TranscriptSearch from "./TranscriptSearch";
 
@@ -17,24 +20,30 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
   const playerRef = useRef<YT.Player | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // ====== DATA FETCHING (TanStack Query) ======
-  const {
-    data: transcript,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["transcript", videoId],
-    queryFn: async () => {
-      const response = await genericFetch<TranscriptDetails>(
-        `/api/transcript/${videoId}`,
-        { method: "GET" },
-      );
-      if (!response.success) throw new Error(response.error.toString());
-      return response.data.transcript;
-    },
-    enabled: !!videoId,
-  });
+  const [transcript, setTranscript] =
+    useState<SpeechmaticsBatchResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+
+  let refreshKey;
+  useEffect(() => {
+    const getTranscript = async () => {
+      setIsLoading(true);
+      try {
+        const response = await genericFetch<TranscriptDetails>(
+          `/api/transcript/${videoId}`,
+        );
+        if (response.success) {
+          setTranscript(response.data.transcript);
+        }
+        setIsLoading(false);
+      } catch {
+        setIsError(true);
+      }
+    };
+
+    if (videoId) getTranscript();
+  }, [videoId, refreshKey]);
 
   const words = transcript ? simplifyTranscript(transcript) : [];
 
@@ -111,7 +120,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
 
           {isError && (
             <div className="p-4 bg-red-50 text-red-600 rounded-xl border border-red-100 text-center">
-              Error: {(error as Error).message}
+              There was an error fetching the transcript for this video
             </div>
           )}
 
