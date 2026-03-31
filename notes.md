@@ -59,6 +59,10 @@ Chosing NextJS as framework for a few reasons:
 - I don't have a great idea for a UI for the search element, so I am going to create a new component that can show the transcript independely of the live scrolling transcript but offer the same sorts of onClick features
 - I sort of have a sliding window working for the word/phrase search but the scroll effect in the transcript pulls focus
 
+## feat-speaker-tag
+
+- I think tanstack router is overkill for this project, so I'm taking it out and just sticking with the NextJS recommended implementation of fetch; I'm not really doing a multip page/multi route/huge API - in the hypothetical world where this application would grow, anyone could come in and tailor a more robust implementation of a router to suit the project needs
+
 ## future
 
 [x] keyword/phrase search
