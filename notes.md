@@ -54,9 +54,22 @@ Chosing NextJS as framework for a few reasons:
 - just adding "scroll into view" logic - will defer on implementing search, will need to "disable scroll" while searching
 - scroll isn't perfect programatically but I think it works - I'm scrolling on the basis of index, so the viewport will scroll to each word even when they're on the same line. You cannot see the scroll, but programatically it is probably happening. If it works like I think it works. it's a trivial amount of wasted computation, but still wasted
 
+## feat-search
+
+- I don't have a great idea for a UI for the search element, so I am going to create a new component that can show the transcript independely of the live scrolling transcript but offer the same sorts of onClick features
+- I sort of have a sliding window working for the word/phrase search but the scroll effect in the transcript pulls focus
+
 ## future
 
-[ ] keyword/phrase search
+[x] keyword/phrase search
 [ ] update speaker tag
+improvements
+[ ] handle weird interaction with scroll - scroll pulls focus from search
+[ ] maybe scrolling the page is the wrong thing and i need to scroll the content itself within the container
+[ ] disable scroll when search is active
+[ ] reduce size of "speaking turn" in search window - maybe only show partials
+[ ] show timestamp near Speaker's name for the start of a given "speaking turn"
+[ ] store each "speaking turn" that matches search criteria in array, create next/back buttons to move through all possible matches for term(s), show timestamps
+stretch
 [ ] stretch - move components, only need default page and an "about" page (maybe a better name is "instructions" or "how to")
 [ ] stretch - bookmark a timestamp "onWordClick"
