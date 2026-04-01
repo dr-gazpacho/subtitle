@@ -14,6 +14,7 @@ import {
 } from "@/data/types";
 import TranscriptView from "./TranscriptView";
 import TranscriptSearch from "./TranscriptSearch";
+import SpeakerTag from "./SpeakerTag";
 
 interface YouTubePlayerProps {
   videoId: string;
@@ -100,8 +101,30 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
 
   const turns = useMemo(() => formatTranscript(words), [words]);
 
+  const onRename = async (oldName: string, newName: string) => {
+    try {
+      const response = await fetch(`/api/transcript/${videoId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ oldName, newName }),
+      });
+
+      if (response.ok) {
+        const updatedData = await response.json();
+        // Option A: Update local state with the new JSON returned by the server
+        setTranscript(updatedData);
+
+        // Option B: If you prefer a fresh fetch, trigger your refreshKey
+        // setRefreshKey(prev => prev + 1);
+      }
+    } catch (err) {
+      console.error("Failed to rename speaker:", err);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center gap-12 p-6 max-w-7xl mx-auto w-full">
+      <SpeakerTag onRename={onRename} turns={turns} />
       {/* 
           side-by-side on large screens, stacked & centered on mobile 
       */}
