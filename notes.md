@@ -67,6 +67,13 @@ Chosing NextJS as framework for a few reasons:
 - I'm just writing to the json in the file system - not scalable for something larger but persistent storage/metadata tagging seems like a deeper, separate concern
 - MUI makes for a nice looking UI and mine currently looks terrible but everything WORKS - beautify this later, maybe create a drawer that slides over the video and transcript that allows you to search and/or edit speaker tags. done for now, but not done
 
+## feat-speaker-tag
+
+- jk learned the hard way file storage with vercel is read only when it's deployed, going to go back to blob storage but only for this json
+- setting up private blob storage, i was able to pull env variables: `vercel link && vercel env pull`
+- pushed blog: `vercel blob put ./data/yp1vkTW3fxI.json --pathname transcripts/yp1vkTW3fxI.json --add-random-suffix false --access private`
+- two hours of missed blob storage later and I think it works
+
 ## future
 
 [x] keyword/phrase search
