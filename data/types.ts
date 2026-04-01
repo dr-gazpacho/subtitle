@@ -119,3 +119,8 @@ export interface SimplifiedTranscript {
   end: number;
   speaker: string;
 }
+
+export interface TranscriptTurn {
+  speaker: string;
+  words: (SimplifiedTranscript & { globalIndex: number })[];
+}

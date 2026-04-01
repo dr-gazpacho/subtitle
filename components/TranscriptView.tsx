@@ -1,20 +1,17 @@
 import { useEffect } from "react";
-import { formatTranscript } from "@/utils/clientUtils";
-import { SimplifiedTranscript } from "@/data/types";
+import { TranscriptTurn } from "@/data/types";
 
 interface TranscriptViewProps {
-  words: SimplifiedTranscript[] | null;
+  turns: TranscriptTurn[];
   activeIndex: number;
   onWordClick: (startTime: number) => void;
 }
 
 const TranscriptView: React.FC<TranscriptViewProps> = ({
-  words,
+  turns,
   activeIndex,
   onWordClick,
 }) => {
-  const turns = formatTranscript(words);
-
   useEffect(() => {
     if (activeIndex !== -1) {
       // I think this will technically "scroll into view" elements that are on the same line (doesn't happen visually, but might happen computationally), which is expending some unnecessary energy

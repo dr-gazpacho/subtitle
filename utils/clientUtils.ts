@@ -2,6 +2,7 @@ import {
   Result,
   SpeechmaticsBatchResponse,
   SimplifiedTranscript,
+  TranscriptTurn,
 } from "@/data/types";
 /**
  *
@@ -74,17 +75,6 @@ export const simplifyTranscript = (data: SpeechmaticsBatchResponse | null) => {
   }
   return words;
 };
-
-/**
- * breaks continuous array or WordResult into array of objects. Each object represents a "speaking turn" or a continuous sentence/statement from a discrete speaker
- * each object contains KV pair for speaker name, then array of WordResult which comprise their current "speaking turn"
- * @param words represents the result of simplifyTranscript
- * @returns array of objects, each object in the array contains a speaker's name and an array of WordResult
- */
-interface TranscriptTurn {
-  speaker: string;
-  words: (SimplifiedTranscript & { globalIndex: number })[];
-}
 
 /**
  * helper function to group "speaking turns" - "speaking turn" defined as a discrete unit of unterupted speech by a unique speaker at least one word long

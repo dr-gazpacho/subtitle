@@ -62,6 +62,7 @@ Chosing NextJS as framework for a few reasons:
 ## feat-speaker-tag
 
 - I think tanstack router is overkill for this project, so I'm taking it out and just sticking with the NextJS recommended implementation of fetch; I'm not really doing a multip page/multi route/huge API - in the hypothetical world where this application would grow, anyone could come in and tailor a more robust implementation of a router to suit the project needs
+- did a very small refactor - considering a larger one to break up this monolithic component - I'm right on the edge of too much state in one place but not certain this is big enough to merit something like zustand or redux
 
 ## future
 

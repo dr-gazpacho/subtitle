@@ -1,8 +1,12 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import YouTube, { YouTubeProps } from "react-youtube";
-import { genericFetch, simplifyTranscript } from "@/utils/clientUtils";
+import {
+  genericFetch,
+  simplifyTranscript,
+  formatTranscript,
+} from "@/utils/clientUtils";
 import {
   YouTubeOptions,
   TranscriptDetails,
@@ -45,7 +49,9 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
     if (videoId) getTranscript();
   }, [videoId, refreshKey]);
 
-  const words = transcript ? simplifyTranscript(transcript) : [];
+  const words = useMemo(() => {
+    return transcript ? simplifyTranscript(transcript) : [];
+  }, [transcript]);
 
   // ====== SYNC LOGIC ======
   const startTracking = () => {
@@ -92,6 +98,8 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
     playerVars: { autoplay: 0 },
   };
 
+  const turns = useMemo(() => formatTranscript(words), [words]);
+
   return (
     <div className="flex flex-col items-center gap-12 p-6 max-w-7xl mx-auto w-full">
       {/* 
@@ -126,7 +134,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
 
           {!isLoading && !isError && (
             <TranscriptView
-              words={words}
+              turns={turns}
               activeIndex={activeIndex}
               onWordClick={onWordClick}
             />
@@ -139,15 +147,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
       */}
       {!isLoading && !isError && (
         <div className="w-full max-w-4xl border-t border-slate-100 pt-10">
-          <div className="mb-6 px-2">
-            <h3 className="text-xl font-bold text-slate-200">
-              Search Mentions
-            </h3>
-            <p className="text-sm text-slate-100">
-              Find specific phrases and jump to that moment in the video.
-            </p>
-          </div>
-          <TranscriptSearch words={words} onWordClick={onWordClick} />
+          <TranscriptSearch turns={turns} onWordClick={onWordClick} />
         </div>
       )}
     </div>
