@@ -34,9 +34,6 @@ export const getTranscript = async <T>(videoId: string): Promise<T | null> => {
   }
 };
 
-import { promises as fs } from "fs";
-import path from "path";
-
 /**
  * Saves a transcript object to the file system as a JSON file.
  * @param videoId The ID used to name the file (e.g., [videoId].json)
@@ -54,11 +51,7 @@ export const saveTranscript = async <T>(
     const dataDir = path.join(process.cwd(), "data");
     const filePath = path.join(dataDir, `${videoId}.json`);
 
-    // Ensure the data directory exists before trying to write
-    // This prevents errors if the folder was accidentally deleted
-    await fs.mkdir(dataDir, { recursive: true });
-
-    // Stringify with 2-space indentation to keep the JSON readable
+    // stringify with 2-space indentation to keep the JSON readable
     const fileContents = JSON.stringify(data, null, 2);
 
     await fs.writeFile(filePath, fileContents, "utf8");
@@ -67,7 +60,7 @@ export const saveTranscript = async <T>(
   } catch (err: unknown) {
     const error = err as NodeJS.ErrnoException;
 
-    // Handle specific file system permissions errors (EACCES) or similar
+    // handle specific file system permissions errors (EACCES) or similar
     console.error(`FileSystem Write Error for ${videoId}:`, error);
     throw new Error(`Failed to save transcript: ${error.message}`);
   }

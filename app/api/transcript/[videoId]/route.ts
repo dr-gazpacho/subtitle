@@ -34,7 +34,7 @@ export async function GET(
     return NextResponse.json(
       {
         id: null,
-        transcript: `An unknown error occured}`,
+        transcript: `An unknown error occured`,
         createdAt: new Date().toISOString(),
       },
       { status: 404 }, // Recommended to return a proper status code
@@ -42,22 +42,38 @@ export async function GET(
   }
 }
 
-import { NextResponse } from "next/server";
-
 export async function PUT(
   request: Request,
   // next 15+ made some methods asynchronous for internal optiization - handle params as promise
   { params }: { params: Promise<{ videoId: string }> },
 ) {
+  const { videoId } = await params;
+
+  if (!videoId) {
+    throw new Error("Missing videoId from request");
+  }
+
   const { oldName, newName } = await request.json();
 
-  // 1. Fetch your existing transcript (from your DB or file system)
-  // For now, let's assume you fetch it based on params.videoId
-  // transcript variable will explicitly be null if no transcript exists in file system
   const transcript = await getTranscript<SpeechmaticsBatchResponse>(videoId);
 
-  // 2. Perform a deep "find and replace" on the speaker names
-  // This is a simple way to swap names in a JSON blob string
+  if (!oldName || !newName) {
+    if (transcript) {
+      return NextResponse.json(transcript);
+    } else {
+      return NextResponse.json(
+        {
+          id: null,
+          transcript: `Transcript was not updated with speaker names, transcript not found`,
+          createdAt: new Date().toISOString(),
+        },
+        { status: 404 }, // Recommended to return a proper status code
+      );
+    }
+  }
+
+  // simple find and replace all - trusts the accuracy of the transcript
+  // narrow use case, so narrow function seems fine
   const updatedTranscriptString = JSON.stringify(transcript).replaceAll(
     `"speaker":"${oldName}"`,
     `"speaker":"${newName}"`,
@@ -65,9 +81,7 @@ export async function PUT(
 
   const updatedTranscript = JSON.parse(updatedTranscriptString);
 
-  // 3. Save the updated version back to your storage
-  await saveTranscript(params.videoId, updatedTranscript);
+  await saveTranscript(videoId, JSON.parse(updatedTranscriptString));
 
-  // 4. Return the new object so the client can update its state
   return NextResponse.json(updatedTranscript);
 }

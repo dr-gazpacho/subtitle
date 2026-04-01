@@ -63,6 +63,8 @@ Chosing NextJS as framework for a few reasons:
 
 - I think tanstack router is overkill for this project, so I'm taking it out and just sticking with the NextJS recommended implementation of fetch; I'm not really doing a multip page/multi route/huge API - in the hypothetical world where this application would grow, anyone could come in and tailor a more robust implementation of a router to suit the project needs
 - did a very small refactor - considering a larger one to break up this monolithic component - I'm right on the edge of too much state in one place but not certain this is big enough to merit something like zustand or redux
+- I'm gonna add MUI - there's a lot of nice elements and accessibility I want to get for free from their components - will defer refactor on the other components for a little bit, maybe I can get a nicer scoll effect with it
+- I'm just writing to the json in the file system - not scalable for something larger but persistent storage/metadata tagging seems like a deeper, separate concern
 
 ## future
 
