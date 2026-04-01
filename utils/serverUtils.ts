@@ -1,4 +1,3 @@
-import { SpeechmaticsBatchResponse } from "@/data/types";
 import { promises as fs } from "fs";
 import path from "path";
 
@@ -32,5 +31,37 @@ export const getTranscript = async <T>(videoId: string): Promise<T | null> => {
     const error = err as NodeJS.ErrnoException;
     throw new Error("Missing videoId from request", { cause: error });
     return null;
+  }
+};
+
+/**
+ * Saves a transcript object to the file system as a JSON file.
+ * @param videoId The ID used to name the file (e.g., [videoId].json)
+ * @param data The transcript object to be stringified and saved
+ */
+export const saveTranscript = async <T>(
+  videoId: string,
+  data: T,
+): Promise<void> => {
+  if (!videoId) {
+    throw new Error("Missing videoId: Cannot save transcript without an ID.");
+  }
+
+  try {
+    const dataDir = path.join(process.cwd(), "data");
+    const filePath = path.join(dataDir, `${videoId}.json`);
+
+    // stringify with 2-space indentation to keep the JSON readable
+    const fileContents = JSON.stringify(data, null, 2);
+
+    await fs.writeFile(filePath, fileContents, "utf8");
+
+    console.log(`Successfully updated transcript for ID: ${videoId}`);
+  } catch (err: unknown) {
+    const error = err as NodeJS.ErrnoException;
+
+    // handle specific file system permissions errors (EACCES) or similar
+    console.error(`FileSystem Write Error for ${videoId}:`, error);
+    throw new Error(`Failed to save transcript: ${error.message}`);
   }
 };

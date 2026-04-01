@@ -59,10 +59,18 @@ Chosing NextJS as framework for a few reasons:
 - I don't have a great idea for a UI for the search element, so I am going to create a new component that can show the transcript independely of the live scrolling transcript but offer the same sorts of onClick features
 - I sort of have a sliding window working for the word/phrase search but the scroll effect in the transcript pulls focus
 
+## feat-speaker-tag
+
+- I think tanstack router is overkill for this project, so I'm taking it out and just sticking with the NextJS recommended implementation of fetch; I'm not really doing a multip page/multi route/huge API - in the hypothetical world where this application would grow, anyone could come in and tailor a more robust implementation of a router to suit the project needs
+- did a very small refactor - considering a larger one to break up this monolithic component - I'm right on the edge of too much state in one place but not certain this is big enough to merit something like zustand or redux
+- I'm gonna add MUI - there's a lot of nice elements and accessibility I want to get for free from their components - will defer refactor on the other components for a little bit, maybe I can get a nicer scoll effect with it
+- I'm just writing to the json in the file system - not scalable for something larger but persistent storage/metadata tagging seems like a deeper, separate concern
+- MUI makes for a nice looking UI and mine currently looks terrible but everything WORKS - beautify this later, maybe create a drawer that slides over the video and transcript that allows you to search and/or edit speaker tags. done for now, but not done
+
 ## future
 
 [x] keyword/phrase search
-[ ] update speaker tag
+[x] update speaker tag
 improvements
 [ ] handle weird interaction with scroll - scroll pulls focus from search
 [ ] maybe scrolling the page is the wrong thing and i need to scroll the content itself within the container
@@ -70,6 +78,7 @@ improvements
 [ ] reduce size of "speaking turn" in search window - maybe only show partials
 [ ] show timestamp near Speaker's name for the start of a given "speaking turn"
 [ ] store each "speaking turn" that matches search criteria in array, create next/back buttons to move through all possible matches for term(s), show timestamps
+[ ] build drawer that contains the speaker tag editing and phrase search
 stretch
 [ ] stretch - move components, only need default page and an "about" page (maybe a better name is "instructions" or "how to")
 [ ] stretch - bookmark a timestamp "onWordClick"
