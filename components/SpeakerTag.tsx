@@ -12,6 +12,7 @@ import {
   TextField,
   Typography,
   Box,
+  Paper,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -25,7 +26,7 @@ interface SpeakerListProps {
   onRename: (oldName: string, newName: string) => Promise<void>;
 }
 
-export default function SpeakerList({ turns, onRename }: SpeakerListProps) {
+export default function SpeakerTag({ turns, onRename }: SpeakerListProps) {
   const [editingName, setEditingName] = useState<string | null>(null);
   const [tempName, setTempName] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -44,48 +45,68 @@ export default function SpeakerList({ turns, onRename }: SpeakerListProps) {
   };
 
   return (
-    <Box
+    <Paper
+      variant="outlined"
       sx={{
-        bgcolor: "white",
-        borderRadius: 2,
         p: 2,
-        border: "1px solid",
-        borderColor: "divider",
+        bgcolor: "background.paper",
+        width: "100%",
+        height: 390,
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <Typography
         variant="overline"
-        sx={{ fontWeight: "bold", color: "black", display: "block", mb: 2 }}
+        sx={{
+          fontWeight: "bold",
+          display: "block",
+          mb: 1,
+          ml: 1,
+        }}
       >
         Speakers in Video
       </Typography>
 
-      <List sx={{ width: "100%" }}>
+      <List
+        sx={{
+          width: "100%",
+          overflowY: "auto",
+          pr: 1,
+          "&::-webkit-scrollbar": { width: "4px" },
+          "&::-webkit-scrollbar-thumb": {
+            bgcolor: "divider",
+            borderRadius: "10px",
+          },
+        }}
+      >
         {speakers.map((speaker) => (
           <ListItem
             key={speaker}
+            disableGutters
+            sx={{ px: 1 }}
             secondaryAction={
               editingName === speaker ? (
-                <Box>
+                <Box sx={{ display: "flex" }}>
                   <IconButton
-                    edge="end"
+                    size="small"
                     onClick={() => handleSave(speaker)}
                     disabled={isSaving}
                     color="success"
                   >
-                    <CheckIcon />
+                    <CheckIcon fontSize="small" />
                   </IconButton>
                   <IconButton
-                    edge="end"
+                    size="small"
                     onClick={() => setEditingName(null)}
                     color="error"
                   >
-                    <CloseIcon />
+                    <CloseIcon fontSize="small" />
                   </IconButton>
                 </Box>
               ) : (
                 <IconButton
-                  edge="end"
+                  size="small"
                   onClick={() => {
                     setEditingName(speaker);
                     setTempName(speaker);
@@ -96,9 +117,9 @@ export default function SpeakerList({ turns, onRename }: SpeakerListProps) {
               )
             }
           >
-            <ListItemAvatar>
-              <Avatar sx={{ bgcolor: "blue" }}>
-                <PersonIcon sx={{ color: "white" }} />
+            <ListItemAvatar sx={{ minWidth: 44 }}>
+              <Avatar sx={{ bgcolor: "primary.main", width: 32, height: 32 }}>
+                <PersonIcon sx={{ color: "white", fontSize: 18 }} />
               </Avatar>
             </ListItemAvatar>
 
@@ -112,20 +133,26 @@ export default function SpeakerList({ turns, onRename }: SpeakerListProps) {
                 size="small"
                 fullWidth
                 slotProps={{
-                  input: { sx: { color: "black" } },
+                  input: { sx: { fontSize: "0.875rem", color: "black" } },
                 }}
               />
             ) : (
               <ListItemText
                 primary={speaker}
                 slotProps={{
-                  primary: { sx: { color: "black", fontWeight: 500 } },
+                  primary: {
+                    sx: {
+                      fontSize: "0.875rem",
+                      fontWeight: 500,
+                      color: "black",
+                    },
+                  },
                 }}
               />
             )}
           </ListItem>
         ))}
       </List>
-    </Box>
+    </Paper>
   );
 }

@@ -79,6 +79,8 @@ Chosing NextJS as framework for a few reasons:
 - going to add a nice frontend component library and keep tailwind in the background; I think this will help my code be more visually readable and will give the app a more comprehensive design langugae for free
 - two birds with one stone to start, updated the TranscriptView (element that shows the transcript and highlights the current word being spoken) to use MUI and implemented a fix to make the transcript scroll nicely
   -- used some Gemini to fine tune the scroll effect, knew I needed to target the content in the container specifically but used the LLM to iterate through strategies and help implement the current scroll effect
+- dropping tailwind out and just using MUI - if I wanted to build my own components from scratch, then I'd stick with tailwind; here it's not adding a ton of value/readability and I don't need tne control
+- dropped some already written components into gemini for a quick translate over to MUI
 
 ## future
 

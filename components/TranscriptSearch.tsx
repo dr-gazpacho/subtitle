@@ -64,11 +64,8 @@ const TranscriptSearch: React.FC<TranscriptSearchProps> = ({
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Box sx={{ mb: 3, px: 1 }}>
-        <Typography
-          variant="h6"
-          sx={{ fontWeight: "bold", color: "text.primary" }}
-        >
+      <Box sx={{ mb: 2, px: 1 }}>
+        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
           Search Mentions
         </Typography>
         <Typography variant="body2" color="text.secondary">
@@ -77,7 +74,7 @@ const TranscriptSearch: React.FC<TranscriptSearchProps> = ({
       </Box>
 
       <Paper variant="outlined" sx={{ borderRadius: 3, overflow: "hidden" }}>
-        <Box sx={{ p: 2, bgcolor: "action.hover" }}>
+        <Box sx={{ p: 2 }}>
           <TextField
             fullWidth
             size="small"
@@ -119,7 +116,6 @@ const TranscriptSearch: React.FC<TranscriptSearchProps> = ({
                   flexDirection: "column",
                   alignItems: "flex-start",
                   p: 2,
-                  "&:hover": { bgcolor: "action.hover" },
                 }}
               >
                 <Typography

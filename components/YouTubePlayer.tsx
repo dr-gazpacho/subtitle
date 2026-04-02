@@ -132,11 +132,9 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 6 }}>
+    <Container maxWidth="xl" sx={{ py: 6 }}>
       <Stack spacing={6} alignItems="center">
-        <SpeakerTag onRename={onRename} turns={turns} />
-
-        {/* side-by-side on large screens, stacked & centered on mobile
+        {/* main dashboard container: Speaker List | Video | Transcript
          */}
         <Box
           sx={{
@@ -144,22 +142,34 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
             flexDirection: { xs: "column", lg: "row" },
             alignItems: { xs: "center", lg: "flex-start" },
             justifyContent: "center",
-            gap: 4,
+            gap: 3,
             width: "100%",
           }}
         >
-          {/* video (sticky on desktop) */}
+          {/* COLUMN 1: Speaker Tags (Scrollable) */}
+          {!isLoading && !isError && (
+            <Box
+              sx={{
+                width: { xs: "100%", lg: 280 },
+                flexShrink: 0,
+                display: "flex",
+                flexDirection: "column",
+                borderRadius: 3,
+              }}
+            >
+              <SpeakerTag onRename={onRename} turns={turns} />
+            </Box>
+          )}
+
+          {/* COLUMN 2: Video (Centerpiece) */}
           <Paper
             elevation={8}
             sx={{
-              position: { lg: "sticky" },
-              top: { lg: 32 },
               width: "fit-content",
-              flexShrink: 0,
-              borderRadius: 4,
               overflow: "hidden",
               bgcolor: "common.black",
-              lineHeight: 0, // Prevents tiny gap at bottom of video
+              lineHeight: 0,
+              flexShrink: 0,
             }}
           >
             <YouTube
@@ -170,8 +180,8 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
             />
           </Paper>
 
-          {/* transcript showing current spoken word*/}
-          <Box sx={{ width: "100%", maxWidth: { lg: 600 }, flex: 1 }}>
+          {/* COLUMN 3: Transcript showing current spoken word */}
+          <Box sx={{ width: "100%", flex: 1, minWidth: { lg: 400 } }}>
             {isLoading && (
               <Skeleton
                 variant="rectangular"
@@ -200,10 +210,10 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
           </Box>
         </Box>
 
-        {/* word/phrase search*/}
+        {/* word/phrase search */}
         {!isLoading && !isError && (
-          <Box sx={{ width: "100%", maxWidth: 900, pt: 4 }}>
-            <Divider sx={{ mb: 6 }} />
+          <Box sx={{ width: "100%", maxWidth: 1100, pt: 1 }}>
+            <Divider sx={{ mb: 2 }} />
             <TranscriptSearch turns={turns} onWordClick={onWordClick} />
           </Box>
         )}

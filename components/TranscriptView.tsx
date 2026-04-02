@@ -48,7 +48,7 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
       variant="outlined"
       sx={{
         p: 3,
-        maxHeight: 400,
+        maxHeight: 390,
         overflowY: "auto",
         display: "flex",
         flexDirection: "column",
@@ -69,7 +69,6 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
                 fontWeight: 900,
                 textTransform: "uppercase",
                 letterSpacing: 1.5,
-                color: "text.disabled",
                 bgcolor: "action.selected",
                 px: 1,
                 borderRadius: 0.5,
