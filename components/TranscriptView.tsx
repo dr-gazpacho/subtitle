@@ -1,5 +1,7 @@
-import { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
+import { Box, Typography, Paper, Divider } from "@mui/material";
 import { TranscriptTurn } from "@/data/types";
+import StyledWord from "./StyledWord";
 
 interface TranscriptViewProps {
   turns: TranscriptTurn[];
@@ -12,54 +14,87 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
   activeIndex,
   onWordClick,
 }) => {
+  // create a ref so I can target the container of the text
+  // scrollTo will control the browser window's main scroll bar, but when I target the container I can target the scroll bar specific to the container instead of the whole window
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    if (activeIndex !== -1) {
-      // I think this will technically "scroll into view" elements that are on the same line (doesn't happen visually, but might happen computationally), which is expending some unnecessary energy
-      // post completion TO DO (if time) - explore "line based scrolling" as opposed to "word based", will probably require some sort of map to link activeIndex to new lineIndex or something
+    if (activeIndex !== -1 && containerRef.current) {
       const activeElement = document.getElementById(`word-${activeIndex}`);
+      const container = containerRef.current;
+
       if (activeElement) {
-        activeElement.scrollIntoView({
+        // need to calculate distance from the very top of the "paper" (the start of the transcript) down to the active word
+        // also gets the active word's height so I can do some math below to scroll to the center of the active word and not the top of it
+        const elementOffsetTop = activeElement.offsetTop;
+        const elementHeight = activeElement.offsetHeight;
+        const containerHeight = container.offsetHeight;
+
+        // center the active word = snap element to top of container, move it down half way into the container, move it down half the height of the active word
+        const scrollTo =
+          elementOffsetTop - containerHeight / 2 + elementHeight / 2;
+
+        container.scrollTo({
+          top: scrollTo,
           behavior: "smooth",
-          block: "center", // I have a lot of the transcript visible - but this will keep the active word in the center to reduce attention fatigue
         });
       }
     }
   }, [activeIndex]);
 
   return (
-    <div className="flex flex-col gap-8 p-6 bg-white rounded-xl shadow-inner max-h-[400px] overflow-y-auto">
-      {/* speaker name */}
+    <Paper
+      ref={containerRef}
+      variant="outlined"
+      sx={{
+        p: 3,
+        maxHeight: 400,
+        overflowY: "auto",
+        display: "flex",
+        flexDirection: "column",
+        gap: 4,
+        position: "relative", // helps with scroll calculation
+        backgroundColor: "background.paper",
+      }}
+    >
       {turns.map((turn, tIdx) => (
-        <div key={tIdx} className="group flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
+        <Box
+          key={tIdx}
+          sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 900,
+                textTransform: "uppercase",
+                letterSpacing: 1.5,
+                color: "text.disabled",
+                bgcolor: "action.selected",
+                px: 1,
+                borderRadius: 0.5,
+              }}
+            >
               {turn.speaker}
-            </span>
-            <div className="h-[1px] flex-1 bg-slate-100" />
-          </div>
-          {/* full content of speaker's "speaking turn" */}
-          <div className="flex flex-wrap leading-relaxed">
+            </Typography>
+            <Divider sx={{ flexGrow: 1, opacity: 0.5 }} />
+          </Box>
+
+          <Box sx={{ display: "flex", flexWrap: "wrap", lineHeight: 1.8 }}>
             {turn.words.map((w) => (
-              <span
+              <StyledWord
                 key={w.globalIndex}
                 id={`word-${w.globalIndex}`}
+                active={activeIndex === w.globalIndex}
                 onClick={() => onWordClick(w.start)}
-                className={`
-                  cursor-pointer px-0.5 rounded transition-all duration-150 text-lg
-                  ${
-                    activeIndex === w.globalIndex
-                      ? "bg-yellow-300 text-black font-medium scale-105 shadow-sm z-10"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-black"
-                  }
-                `}
               >
                 {w.word}
-              </span>
+              </StyledWord>
             ))}
-          </div>
-        </div>
+          </Box>
+        </Box>
       ))}
-    </div>
+    </Paper>
   );
 };
 
