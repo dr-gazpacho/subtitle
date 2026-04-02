@@ -14,7 +14,6 @@ const StyledWord = styled("span")<{ active?: boolean }>(
           backgroundColor: theme.palette.warning.light,
           color: theme.palette.common.black,
           boxShadow: theme.shadows[1],
-          transition: "all 150ms ease-in-out",
           zIndex: 1,
         }
       : {

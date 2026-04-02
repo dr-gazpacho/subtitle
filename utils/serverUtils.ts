@@ -48,6 +48,7 @@ export const saveTranscript = async <T>(
       contentType: "application/json",
     });
   } catch (err) {
-    throw new Error("Failed to save transcript");
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    throw new Error(`Failed to save transcript with error: ${errorMessage}`);
   }
 };
