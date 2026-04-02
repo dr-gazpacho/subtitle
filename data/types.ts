@@ -124,3 +124,15 @@ export interface TranscriptTurn {
   speaker: string;
   words: (SimplifiedTranscript & { globalIndex: number })[];
 }
+
+export interface TranscriptSearchProps {
+  turns: TranscriptTurn[];
+  onWordClick: (startTime: number) => void;
+}
+
+export interface Match {
+  speaker: string;
+  words: (SimplifiedTranscript & { globalIndex: number })[];
+  matchStartIndex: number;
+  matchEndIndex: number;
+}

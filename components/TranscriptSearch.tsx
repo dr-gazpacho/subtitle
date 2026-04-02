@@ -1,17 +1,17 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { TranscriptTurn, SimplifiedTranscript } from "@/data/types";
-
-interface TranscriptSearchProps {
-  turns: TranscriptTurn[];
-  onWordClick: (startTime: number) => void;
-}
-
-interface Match {
-  speaker: string;
-  words: (SimplifiedTranscript & { globalIndex: number })[];
-  matchStartIndex: number;
-  matchEndIndex: number;
-}
+import {
+  Box,
+  Typography,
+  TextField,
+  Paper,
+  List,
+  ListItem,
+  InputAdornment,
+  Divider,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import { TranscriptSearchProps, Match } from "@/data/types";
+import StyledWord from "./StyledWord";
 
 const TranscriptSearch: React.FC<TranscriptSearchProps> = ({
   turns,
@@ -20,7 +20,6 @@ const TranscriptSearch: React.FC<TranscriptSearchProps> = ({
   // this will be sort of like a finite state machine where inputValue sets the state of searchTerm and searchTerm controls the search
   // user types a word/phrase (state is constantly updating but no search happens) -> stop typing -> .3 seconds elapses and search term state captures input state
   // --> search term state updates which triggers the search for word or phrase
-
   const [inputValue, setInputValue] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -64,70 +63,99 @@ const TranscriptSearch: React.FC<TranscriptSearchProps> = ({
   }, [searchTerm, turns]);
 
   return (
-    <>
-      <div className="mb-6 px-2">
-        <h3 className="text-xl font-bold text-slate-200">Search Mentions</h3>
-        <p className="text-sm text-slate-100">
+    <Box sx={{ width: "100%" }}>
+      <Box sx={{ mb: 3, px: 1 }}>
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: "bold", color: "text.primary" }}
+        >
+          Search Mentions
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
           Find specific phrases and jump to that moment in the video.
-        </p>
-      </div>
+        </Typography>
+      </Box>
 
-      <div className="w-full bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-4 border-b border-slate-100 bg-slate-50/50">
-          <input
-            type="text"
+      <Paper variant="outlined" sx={{ borderRadius: 3, overflow: "hidden" }}>
+        <Box sx={{ p: 2, bgcolor: "action.hover" }}>
+          <TextField
+            fullWidth
+            size="small"
             placeholder='Try "first tuesday of the month"...'
-            className="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500 text-black placeholder-slate-400"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" />
+                  </InputAdornment>
+                ),
+              },
+            }}
+            sx={{ bgcolor: "background.paper", borderRadius: 1 }}
           />
-        </div>
+        </Box>
 
-        <div className="max-h-[400px] overflow-y-auto divide-y divide-slate-100">
+        <Divider />
+
+        <List sx={{ maxHeight: 400, overflowY: "auto", p: 0 }}>
           {searchTerm && results.length === 0 ? (
-            <p className="p-8 text-center text-slate-400 italic">
-              No matches found.
-            </p>
+            <Box sx={{ p: 4, textAlign: "center" }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontStyle: "italic" }}
+              >
+                No matches found.
+              </Typography>
+            </Box>
           ) : (
             results.map((res, idx) => (
-              <div
+              <ListItem
                 key={idx}
-                className="p-4 hover:bg-slate-50 transition-colors"
+                divider
+                sx={{
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  p: 2,
+                  "&:hover": { bgcolor: "action.hover" },
+                }}
               >
-                <span className="text-[10px] font-black text-slate-400 uppercase mb-2 block tracking-widest">
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 900,
+                    textTransform: "uppercase",
+                    letterSpacing: 1.2,
+                    color: "text.disabled",
+                    mb: 1,
+                  }}
+                >
                   {res.speaker}
-                </span>
-                <div className="flex flex-wrap gap-1">
-                  {res.words.map(
-                    (
-                      w: SimplifiedTranscript & { globalIndex: number },
-                      wIdx: number,
-                    ) => {
-                      const isMatchPart =
-                        wIdx >= res.matchStartIndex &&
-                        wIdx <= res.matchEndIndex;
-                      return (
-                        <span
-                          key={wIdx}
-                          onClick={() => onWordClick(w.start)}
-                          className={`cursor-pointer px-1 rounded text-sm transition-all ${
-                            isMatchPart
-                              ? "bg-yellow-300 text-black font-bold scale-110 shadow-sm z-10"
-                              : "text-slate-600 hover:bg-slate-200 hover:text-black"
-                          }`}
-                        >
-                          {w.word}
-                        </span>
-                      );
-                    },
-                  )}
-                </div>
-              </div>
+                </Typography>
+
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {res.words.map((w, wIdx) => {
+                    const isMatchPart =
+                      wIdx >= res.matchStartIndex && wIdx <= res.matchEndIndex;
+                    return (
+                      <StyledWord
+                        key={wIdx}
+                        active={isMatchPart}
+                        onClick={() => onWordClick(w.start)}
+                      >
+                        {w.word}
+                      </StyledWord>
+                    );
+                  })}
+                </Box>
+              </ListItem>
             ))
           )}
-        </div>
-      </div>
-    </>
+        </List>
+      </Paper>
+    </Box>
   );
 };
 
