@@ -100,6 +100,9 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
 
   const onWordClick = (wordStartTime: number) => {
     playerRef.current?.seekTo(wordStartTime, true);
+    if (playerRef.current) {
+      playerRef.current.playVideo();
+    }
   };
 
   const opts: YouTubeOptions = {

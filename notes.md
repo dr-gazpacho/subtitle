@@ -84,7 +84,8 @@ Chosing NextJS as framework for a few reasons:
 
 ## feat-ui-updates
 
-- added small gradient mask to the transcript to make
+- added small gradient mask to the transcript
+- if video is paused, clicking on a word start the video playing again
 
 ## future
 
