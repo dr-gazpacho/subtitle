@@ -111,3 +111,14 @@ export const formatTranscript = (words: SimplifiedTranscript[] | null) => {
   turns.push(currentTurn);
   return turns;
 };
+
+/**
+ * helper function to format raw seconds into MM:SS
+ * @param seconds marks point in time in seconds when a given word is spoken in the transcript
+ * @returns time formatted MM:SS
+ */
+export const formatTime = (seconds: number) => {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+};

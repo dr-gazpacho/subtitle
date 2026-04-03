@@ -82,6 +82,15 @@ Chosing NextJS as framework for a few reasons:
 - dropping tailwind out and just using MUI - if I wanted to build my own components from scratch, then I'd stick with tailwind; here it's not adding a ton of value/readability and I don't need tne control
 - dropped some already written components into gemini for a quick translate over to MUI
 
+## feat-ui-updates
+
+- added small gradient mask to the transcript
+- if video is paused, clicking on a word start the video playing again
+- updated transcript search to feel a little nicer
+  -- added timestamp to each result
+  -- added some height and scroll effects on the container
+  -- added pagination because the infinitely scrollable list was not ideal
+
 ## future
 
 [x] keyword/phrase search
@@ -92,9 +101,9 @@ improvements
 [x] maybe scrolling the page is the wrong thing and i need to scroll the content itself within the container
 [x] ~~disable scroll when search is active~~ only scrolling the sub container with the transcript solved this
 [ ] reduce size of "speaking turn" in search window - maybe only show partials
-[ ] show timestamp near Speaker's name for the start of a given "speaking turn"
-[ ] store each "speaking turn" that matches search criteria in array, create next/back buttons to move through all possible matches for term(s), show timestamps
-[ ] build drawer that contains the speaker tag editing and phrase search
+[x] show timestamp near Speaker's name for the start of a given "speaking turn"
+[x] store each "speaking turn" that matches search criteria in array, create next/back buttons to move through all possible matches for term(s), show timestamps (forgot the word for pagination)
+[ ] ~~build drawer that contains the speaker tag editing and phrase search~~ desktop UI got rearranged and is OK, though this is not optimised for a phone or tablet, would need to reconsider the entire UI
 stretch
 [ ] stretch - move components, only need default page and an "about" page (maybe a better name is "instructions" or "how to")
 [ ] stretch - bookmark a timestamp "onWordClick"
