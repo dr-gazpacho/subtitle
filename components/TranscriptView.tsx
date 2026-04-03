@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useRef } from "react";
 import { Box, Typography, Paper, Divider } from "@mui/material";
 import { TranscriptTurn } from "@/data/types";
@@ -55,6 +57,27 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
         gap: 4,
         position: "relative", // helps with scroll calculation
         backgroundColor: "background.paper",
+
+        /* GRADIENT MASK LOGIC
+          This creates a transparency mask. 
+          0-10%: Transparent to Opaque
+          10-90%: Fully Opaque (normal text)
+          90-100%: Opaque to Transparent
+        */
+        WebkitMaskImage: `linear-gradient(
+          to bottom,
+          transparent 0%,
+          black 20%,
+          black 80%,
+          transparent 100%
+        )`,
+        maskImage: `linear-gradient(
+          to bottom,
+          transparent 0%,
+          black 20%,
+          black 80%,
+          transparent 100%
+        )`,
       }}
     >
       {turns.map((turn, tIdx) => (

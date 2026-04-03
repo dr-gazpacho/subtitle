@@ -82,6 +82,10 @@ Chosing NextJS as framework for a few reasons:
 - dropping tailwind out and just using MUI - if I wanted to build my own components from scratch, then I'd stick with tailwind; here it's not adding a ton of value/readability and I don't need tne control
 - dropped some already written components into gemini for a quick translate over to MUI
 
+## feat-ui-updates
+
+- added small gradient mask to the transcript to make
+
 ## future
 
 [x] keyword/phrase search
