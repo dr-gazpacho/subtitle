@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import {
   Box,
   Typography,
@@ -8,10 +8,17 @@ import {
   ListItem,
   InputAdornment,
   Divider,
+  IconButton,
+  Stack,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import {
+  Search as SearchIcon,
+  ChevronLeft,
+  ChevronRight,
+} from "@mui/icons-material";
 import { TranscriptSearchProps, Match } from "@/data/types";
 import StyledWord from "./StyledWord";
+import { formatTime } from "@/utils/clientUtils";
 
 const TranscriptSearch: React.FC<TranscriptSearchProps> = ({
   turns,
@@ -22,12 +29,36 @@ const TranscriptSearch: React.FC<TranscriptSearchProps> = ({
   // --> search term state updates which triggers the search for word or phrase
   const [inputValue, setInputValue] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+
+  // Ref to the scrollable list container
+  const listRef = useRef<HTMLUListElement>(null);
 
   // debouncer makes this feel a little smoother
   useEffect(() => {
-    const timer = setTimeout(() => setSearchTerm(inputValue), 300);
+    const timer = setTimeout(() => {
+      setSearchTerm(inputValue);
+      setCurrentPage(0);
+    }, 300);
     return () => clearTimeout(timer);
   }, [inputValue]);
+
+  // scroll the matching word into view whenever the "page" changes
+  // not using computed scroll from the transcript view, a user will logically already be down here so when the search the scroll won't feel so jarring
+  useEffect(() => {
+    if (listRef.current) {
+      const activeWord = listRef.current.querySelector(".search-match-start");
+      if (activeWord) {
+        activeWord.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      } else {
+        // reset scroll to top if no match (e.g., new search)
+        listRef.current.scrollTop = 0;
+      }
+    }
+  }, [currentPage, searchTerm]);
 
   const results = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -38,8 +69,7 @@ const TranscriptSearch: React.FC<TranscriptSearchProps> = ({
     const searchWords = query.split(/\s+/);
     const matches: Match[] = [];
 
-    // I don't know if this is the best sliding window but it works
-    // Maybe there's a world where we also want the timestamps considered or something.. for now we're going to return each speaking turn which contains the searchTerm
+    // sliding window to search for word or term - also will partial match so search for FRI would return FRIED
     turns.forEach((turn) => {
       for (let i = 0; i <= turn.words.length - searchWords.length; i++) {
         let matchFound = true;
@@ -62,6 +92,20 @@ const TranscriptSearch: React.FC<TranscriptSearchProps> = ({
     return matches;
   }, [searchTerm, turns]);
 
+  const currentMatch = results[currentPage];
+
+  const handleNext = () => {
+    if (currentPage < results.length - 1) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentPage > 0) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
   return (
     <Box sx={{ width: "100%" }}>
       <Box sx={{ mb: 2, px: 1 }}>
@@ -74,6 +118,7 @@ const TranscriptSearch: React.FC<TranscriptSearchProps> = ({
       </Box>
 
       <Paper variant="outlined" sx={{ borderRadius: 3, overflow: "hidden" }}>
+        {/* input */}
         <Box sx={{ p: 2 }}>
           <TextField
             fullWidth
@@ -96,48 +141,135 @@ const TranscriptSearch: React.FC<TranscriptSearchProps> = ({
 
         <Divider />
 
-        <List sx={{ maxHeight: 400, overflowY: "auto", p: 0 }}>
-          {searchTerm && results.length === 0 ? (
-            <Box sx={{ p: 4, textAlign: "center" }}>
+        {/* pagination controls*/}
+        {searchTerm && results.length > 0 && (
+          <>
+            <Box sx={{ p: 1.5, bgcolor: "action.hover" }}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <IconButton
+                    size="small"
+                    onClick={handlePrev}
+                    disabled={currentPage === 0}
+                  >
+                    <ChevronLeft fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={handleNext}
+                    disabled={currentPage === results.length - 1}
+                  >
+                    <ChevronRight fontSize="small" />
+                  </IconButton>
+                </Box>
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 600, color: "text.secondary", mr: 1 }}
+                >
+                  Match {currentPage + 1} of {results.length}
+                </Typography>
+              </Stack>
+            </Box>
+            <Divider />
+          </>
+        )}
+
+        {/* scrollable viewport */}
+        <Box sx={{ height: 390, display: "flex", flexDirection: "column" }}>
+          {!searchTerm ? (
+            <Box sx={{ p: 6, textAlign: "center", flex: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                Enter a keyword to search the transcript.
+              </Typography>
+            </Box>
+          ) : results.length === 0 ? (
+            <Box sx={{ p: 6, textAlign: "center", flex: 1 }}>
               <Typography
                 variant="body2"
                 color="text.secondary"
                 sx={{ fontStyle: "italic" }}
               >
-                No matches found.
+                {`No matches found for "${searchTerm}".`}
               </Typography>
             </Box>
           ) : (
-            results.map((res, idx) => (
+            <List
+              ref={listRef}
+              sx={{
+                flex: 1,
+                overflowY: "auto",
+                p: 0,
+                // Custom scrollbar for a cleaner look
+                "&::-webkit-scrollbar": { width: "6px" },
+                "&::-webkit-scrollbar-thumb": {
+                  bgcolor: "divider",
+                  borderRadius: "10px",
+                },
+              }}
+            >
               <ListItem
-                key={idx}
-                divider
                 sx={{
                   flexDirection: "column",
                   alignItems: "flex-start",
-                  p: 2,
+                  p: 3,
                 }}
               >
-                <Typography
-                  variant="caption"
+                {/* Header Row: Speaker Name & Timestamp */}
+                <Box
                   sx={{
-                    fontWeight: 900,
-                    textTransform: "uppercase",
-                    letterSpacing: 1.2,
-                    color: "text.disabled",
-                    mb: 1,
+                    display: "flex",
+                    width: "100%",
+                    justifyContent: "space-between",
+                    mb: 2,
                   }}
                 >
-                  {res.speaker}
-                </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 900,
+                      textTransform: "uppercase",
+                      letterSpacing: 1.5,
+                      bgcolor: "action.selected",
+                      px: 1,
+                      borderRadius: 0.5,
+                    }}
+                  >
+                    {currentMatch.speaker}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontFamily: "monospace",
+                      fontWeight: 700,
+                      color: "primary.main",
+                      bgcolor: "action.hover",
+                      px: 0.8,
+                      py: 0.2,
+                      borderRadius: 1,
+                    }}
+                  >
+                    {formatTime(
+                      currentMatch.words[currentMatch.matchStartIndex].start,
+                    )}
+                  </Typography>
+                </Box>
 
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                  {res.words.map((w, wIdx) => {
+                  {currentMatch.words.map((w, wIdx) => {
+                    const isMatchStart = wIdx === currentMatch.matchStartIndex;
                     const isMatchPart =
-                      wIdx >= res.matchStartIndex && wIdx <= res.matchEndIndex;
+                      wIdx >= currentMatch.matchStartIndex &&
+                      wIdx <= currentMatch.matchEndIndex;
+
                     return (
                       <StyledWord
                         key={wIdx}
+                        // added a className so we can target the specific word for scrollIntoView
+                        className={isMatchStart ? "search-match-start" : ""}
                         active={isMatchPart}
                         onClick={() => onWordClick(w.start)}
                       >
@@ -147,9 +279,9 @@ const TranscriptSearch: React.FC<TranscriptSearchProps> = ({
                   })}
                 </Box>
               </ListItem>
-            ))
+            </List>
           )}
-        </List>
+        </Box>
       </Paper>
     </Box>
   );

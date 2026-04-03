@@ -86,6 +86,10 @@ Chosing NextJS as framework for a few reasons:
 
 - added small gradient mask to the transcript
 - if video is paused, clicking on a word start the video playing again
+- updated transcript search to feel a little nicer
+  -- added timestamp to each result
+  -- added some height and scroll effects on the container
+  -- added pagination because the infinitely scrollable list was not ideal
 
 ## future
 
