@@ -74,14 +74,23 @@ Chosing NextJS as framework for a few reasons:
 - pushed blog: `vercel blob put ./data/yp1vkTW3fxI.json --pathname transcripts/yp1vkTW3fxI.json --add-random-suffix false --access private`
 - two hours of missed blob storage later and I think it works
 
+## feat-mui
+
+- going to add a nice frontend component library and keep tailwind in the background; I think this will help my code be more visually readable and will give the app a more comprehensive design langugae for free
+- two birds with one stone to start, updated the TranscriptView (element that shows the transcript and highlights the current word being spoken) to use MUI and implemented a fix to make the transcript scroll nicely
+  -- used some Gemini to fine tune the scroll effect, knew I needed to target the content in the container specifically but used the LLM to iterate through strategies and help implement the current scroll effect
+- dropping tailwind out and just using MUI - if I wanted to build my own components from scratch, then I'd stick with tailwind; here it's not adding a ton of value/readability and I don't need tne control
+- dropped some already written components into gemini for a quick translate over to MUI
+
 ## future
 
 [x] keyword/phrase search
 [x] update speaker tag
 improvements
-[ ] handle weird interaction with scroll - scroll pulls focus from search
-[ ] maybe scrolling the page is the wrong thing and i need to scroll the content itself within the container
-[ ] disable scroll when search is active
+[x] implement MUI
+[x] handle weird interaction with scroll - scroll pulls focus from search
+[x] maybe scrolling the page is the wrong thing and i need to scroll the content itself within the container
+[x] ~~disable scroll when search is active~~ only scrolling the sub container with the transcript solved this
 [ ] reduce size of "speaking turn" in search window - maybe only show partials
 [ ] show timestamp near Speaker's name for the start of a given "speaking turn"
 [ ] store each "speaking turn" that matches search criteria in array, create next/back buttons to move through all possible matches for term(s), show timestamps

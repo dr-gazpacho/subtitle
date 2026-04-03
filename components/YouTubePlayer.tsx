@@ -3,6 +3,15 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import YouTube, { YouTubeProps } from "react-youtube";
 import {
+  Box,
+  Container,
+  Alert,
+  Skeleton,
+  Divider,
+  Paper,
+  Stack,
+} from "@mui/material";
+import {
   genericFetch,
   simplifyTranscript,
   formatTranscript,
@@ -123,57 +132,93 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-12 p-6 max-w-7xl mx-auto w-full">
-      <SpeakerTag onRename={onRename} turns={turns} />
-      {/* 
-          side-by-side on large screens, stacked & centered on mobile 
-      */}
-      <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center gap-8 w-full">
-        {/* video (sticky on desktop) */}
-        <div className="lg:sticky lg:top-8 w-fit flex-shrink-0 shadow-xl rounded-2xl overflow-hidden border border-slate-200 bg-black">
-          <YouTube
-            videoId={videoId}
-            opts={opts}
-            onReady={onReady}
-            onStateChange={onStateChange}
-          />
-        </div>
-
-        {/* transcript showing current spoken word*/}
-        <div className="w-full max-w-2xl flex-1">
-          {isLoading && (
-            <div className="h-[390px] flex items-center justify-center bg-slate-50 rounded-xl border border-dashed border-slate-300">
-              <p className="text-slate-400 animate-pulse">
-                Loading transcript...
-              </p>
-            </div>
-          )}
-
-          {isError && (
-            <div className="p-4 bg-red-50 text-red-600 rounded-xl border border-red-100 text-center">
-              There was an error fetching the transcript for this video
-            </div>
-          )}
-
+    <Container maxWidth="xl" sx={{ py: 6 }}>
+      <Stack spacing={6} alignItems="center">
+        {/* main dashboard container: Speaker List | Video | Transcript
+         */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", lg: "row" },
+            alignItems: { xs: "center", lg: "flex-start" },
+            justifyContent: "center",
+            gap: 3,
+            width: "100%",
+          }}
+        >
+          {/* COLUMN 1: Speaker Tags (Scrollable) */}
           {!isLoading && !isError && (
-            <TranscriptView
-              turns={turns}
-              activeIndex={activeIndex}
-              onWordClick={onWordClick}
-            />
+            <Box
+              sx={{
+                width: { xs: "100%", lg: 280 },
+                flexShrink: 0,
+                display: "flex",
+                flexDirection: "column",
+                borderRadius: 3,
+              }}
+            >
+              <SpeakerTag onRename={onRename} turns={turns} />
+            </Box>
           )}
-        </div>
-      </div>
 
-      {/* 
-          word/phrase search
-      */}
-      {!isLoading && !isError && (
-        <div className="w-full max-w-4xl border-t border-slate-100 pt-10">
-          <TranscriptSearch turns={turns} onWordClick={onWordClick} />
-        </div>
-      )}
-    </div>
+          {/* COLUMN 2: Video (Centerpiece) */}
+          <Paper
+            elevation={8}
+            sx={{
+              width: "fit-content",
+              overflow: "hidden",
+              bgcolor: "common.black",
+              lineHeight: 0,
+              flexShrink: 0,
+            }}
+          >
+            <YouTube
+              videoId={videoId}
+              opts={opts}
+              onReady={onReady}
+              onStateChange={onStateChange}
+            />
+          </Paper>
+
+          {/* COLUMN 3: Transcript showing current spoken word */}
+          <Box sx={{ width: "100%", flex: 1, minWidth: { lg: 400 } }}>
+            {isLoading && (
+              <Skeleton
+                variant="rectangular"
+                height={390}
+                sx={{ borderRadius: 3, bgcolor: "action.hover" }}
+              />
+            )}
+
+            {isError && (
+              <Alert
+                severity="error"
+                variant="outlined"
+                sx={{ borderRadius: 3 }}
+              >
+                There was an error fetching the transcript for this video
+              </Alert>
+            )}
+
+            {!isLoading && !isError && (
+              <TranscriptView
+                turns={turns}
+                activeIndex={activeIndex}
+                onWordClick={onWordClick}
+              />
+            )}
+          </Box>
+        </Box>
+
+        {/* word/phrase search */}
+        {!isLoading && !isError && (
+          <Box sx={{ width: "100%", maxWidth: 1100, pt: 1 }}>
+            <Divider sx={{ mb: 2 }} />
+            <TranscriptSearch turns={turns} onWordClick={onWordClick} />
+          </Box>
+        )}
+      </Stack>
+    </Container>
   );
 };
 
