@@ -118,6 +118,5 @@ Chosing NextJS as framework for a few reasons:
 - [x] ~~build drawer that contains the speaker tag editing and phrase search~~ desktop UI got rearranged and is OK, though this is not optimised for a phone or tablet, would need to reconsider the entire UI
       stretch
 - [x] stretch - move components, only need default page and an "about" page (maybe a better name is "instructions" or "how to")
-
-- [ ] stretch - unit tests
+- [x] stretch - unit tests
 - [ ] stretch - bookmark a timestamp "onWordClick"
