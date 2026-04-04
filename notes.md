@@ -97,6 +97,12 @@ Chosing NextJS as framework for a few reasons:
 - adding a little header to navigate back and forth between the transcript/video component and the "about" page (instructions)
 - updating the about page and the readme for support/accuracy/being a good steward of software (the how we got here can be just as important as where we are)
 
+## feat-unit-tests
+
+- I did not follow TDD here. I have mixed feelings about it dogmatically, but I have strong feelings that any good application needs some battery of tests to ensure that anyone developing the application does not integrate regressions/breaking changes unknowingly.
+- I'm not creating a comprehensive suite of E2E tests or regression tests, but I will create some basic unit tests and a precommit hook to run them
+- Little functional unit tests, I've found, are great candidates for using generative techologies. Since I tend to write functions with overt JS Doc annotations that area heavily typed, an LLM ususally can produce some effective tests to protect a function from blind changes with unintended consequences
+
 ## future
 
 - [x] keyword/phrase search

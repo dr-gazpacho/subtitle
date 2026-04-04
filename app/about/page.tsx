@@ -46,7 +46,7 @@ const AboutPage = () => {
             <Typography
               variant="body1"
               lineHeight={1.8}
-              sx={{ fontSize: "1.1rem" }}
+              sx={{ fontSize: "1.1rem", marginBottom: 1 }}
             >
               SyncScript is a NextJS web application that syncronizes
               AI-generated transcripts with their corresponding video source. A
@@ -54,6 +54,15 @@ const AboutPage = () => {
               speaker tags, and view the live transcript along side a playing
               video. Clicking a given word in the transcript will advance the
               video playback to the corresponding time.
+            </Typography>
+            <Typography
+              variant="body1"
+              lineHeight={1.8}
+              sx={{ fontSize: "1.1rem" }}
+            >
+              This project is optimised for use on a desktop or medium to large
+              screen laptop; layout optimizations are planned for the future,
+              thank you for your patience.
             </Typography>
           </Paper>
         </Box>
