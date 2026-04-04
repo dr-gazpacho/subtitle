@@ -105,18 +105,5 @@ Chosing NextJS as framework for a few reasons:
 
 ## future
 
-- [x] keyword/phrase search
-- [x] update speaker tag
-      improvements
-- [x] implement MUI
-- [x] handle weird interaction with scroll - scroll pulls focus from search
-- [x] maybe scrolling the page is the wrong thing and i need to scroll the content itself within the container
-- [x] ~~disable scroll when search is active~~ only scrolling the sub container with the transcript solved this
-- [x] reduce size of "speaking turn" in search window - maybe only show partials
-- [x] show timestamp near Speaker's name for the start of a given "speaking turn"
-- [x] store each "speaking turn" that matches search criteria in array, create next/back buttons to move through all possible matches for term(s), show timestamps (forgot the word for pagination)
-- [x] ~~build drawer that contains the speaker tag editing and phrase search~~ desktop UI got rearranged and is OK, though this is not optimised for a phone or tablet, would need to reconsider the entire UI
-      stretch
-- [x] stretch - move components, only need default page and an "about" page (maybe a better name is "instructions" or "how to")
-- [x] stretch - unit tests
 - [ ] stretch - bookmark a timestamp "onWordClick"
+- [ ] stretch - optimize mobile view
