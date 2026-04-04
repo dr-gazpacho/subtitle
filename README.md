@@ -40,8 +40,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 TO DO:
 
 - [ ] update readme
-- [ ] hande local development (don't assume end user can pull env variables from vercel)
+- [x] hande local development (don't assume end user can pull env variables from vercel)
 - [ ] stretch - move components, only need default page and an "about" page (maybe a better name is "instructions" or "how to")
 - [ ] stretch - unit tests
-- [ ] stretch - audit/qa for keyboard navigation/screen reader accessibility
 - [ ] stretch - bookmark a timestamp "onWordClick"

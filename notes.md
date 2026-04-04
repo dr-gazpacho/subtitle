@@ -94,6 +94,7 @@ Chosing NextJS as framework for a few reasons:
 ## feat-quality-of-life
 
 - the get and save methods for the transcript are good candidates for a little strategy pattern. I replaced the function bodies when I moved from local storage to blob storage, but kept the same function signature. I don't think that someone else developing/running this app locally would be able to `vercel link` to my blob store. Considering I've already tried to encapsulate the getting/saving logic into it's own function, I can re-implement my local storage solution and wrap it and blob storage in a strategy so select which method to use at runtime
+- adding a little header to navigate back and forth between the transcript/video component and the "about" page (instructions)
 
 ## future
 

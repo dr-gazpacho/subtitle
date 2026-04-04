@@ -25,11 +25,13 @@ import TranscriptView from "./TranscriptView";
 import TranscriptSearch from "./TranscriptSearch";
 import SpeakerTag from "./SpeakerTag";
 
-interface YouTubePlayerProps {
+interface VideoTranscriptSyncProps {
   videoId: string;
 }
 
-const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
+const VideoTranscriptSync: React.FC<VideoTranscriptSyncProps> = ({
+  videoId,
+}) => {
   const [activeIndex, setActiveIndex] = useState<number>(-1);
   const playerRef = useRef<YT.Player | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -225,4 +227,4 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
   );
 };
 
-export default YouTubePlayer;
+export default VideoTranscriptSync;
