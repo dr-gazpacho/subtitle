@@ -3,7 +3,7 @@ import {
   SpeechmaticsBatchResponse,
   SimplifiedTranscript,
   TranscriptTurn,
-} from "@/data/types";
+} from "@/types/types";
 /**
  *
  * @param url - plan to use only one URL then using different HTTP actions

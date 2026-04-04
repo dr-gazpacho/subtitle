@@ -20,7 +20,7 @@ import {
   YouTubeOptions,
   TranscriptDetails,
   SpeechmaticsBatchResponse,
-} from "@/data/types";
+} from "@/types/types";
 import TranscriptView from "./TranscriptView";
 import TranscriptSearch from "./TranscriptSearch";
 import SpeakerTag from "./SpeakerTag";

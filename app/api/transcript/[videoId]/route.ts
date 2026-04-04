@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getTranscript, saveTranscript } from "@/utils/serverUtils";
-import { SpeechmaticsBatchResponse } from "@/data/types";
+import { SpeechmaticsBatchResponse } from "@/types/types";
 
 export async function GET(
   request: Request,

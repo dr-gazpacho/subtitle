@@ -110,5 +110,5 @@ improvements
 [x] store each "speaking turn" that matches search criteria in array, create next/back buttons to move through all possible matches for term(s), show timestamps (forgot the word for pagination)
 [x] ~~build drawer that contains the speaker tag editing and phrase search~~ desktop UI got rearranged and is OK, though this is not optimised for a phone or tablet, would need to reconsider the entire UI
 stretch
-[ ] stretch - move components, only need default page and an "about" page (maybe a better name is "instructions" or "how to")
+[x] stretch - move components, only need default page and an "about" page (maybe a better name is "instructions" or "how to")
 [ ] stretch - bookmark a timestamp "onWordClick"
