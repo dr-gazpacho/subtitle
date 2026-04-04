@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import { Box, Typography, Paper, Divider } from "@mui/material";
-import { TranscriptTurn } from "@/data/types";
+import { TranscriptTurn } from "@/types/types";
 import StyledWord from "./StyledWord";
 
 interface TranscriptViewProps {

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { TranscriptTurn } from "@/data/types";
+import { TranscriptTurn } from "@/types/types";
 import {
   List,
   ListItem,

@@ -16,7 +16,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "@mui/icons-material";
-import { TranscriptSearchProps, Match } from "@/data/types";
+import { TranscriptSearchProps, Match } from "@/types/types";
 import StyledWord from "./StyledWord";
 import { formatTime } from "@/utils/clientUtils";
 
