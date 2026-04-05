@@ -103,6 +103,10 @@ Chosing NextJS as framework for a few reasons:
 - I'm not creating a comprehensive suite of E2E tests or regression tests, but I will create some basic unit tests and a precommit hook to run them
 - Little functional unit tests, I've found, are great candidates for using generative techologies. Since I tend to write functions with overt JS Doc annotations that area heavily typed, an LLM ususally can produce some effective tests to protect a function from blind changes with unintended consequences
 
+## feat-loading-state
+
+- add some skeleton loaders to make the UI feel a little nicer, handles video and transcript loading at different times
+
 ## future
 
 - [ ] stretch - bookmark a timestamp "onWordClick"

@@ -2,15 +2,7 @@
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import YouTube, { YouTubeProps } from "react-youtube";
-import {
-  Box,
-  Container,
-  Alert,
-  Skeleton,
-  Divider,
-  Paper,
-  Stack,
-} from "@mui/material";
+import { Box, Container, Alert, Divider, Paper, Stack } from "@mui/material";
 import {
   genericFetch,
   simplifyTranscript,
@@ -24,6 +16,8 @@ import {
 import TranscriptView from "./TranscriptView";
 import TranscriptSearch from "./TranscriptSearch";
 import SpeakerTag from "./SpeakerTag";
+import SkeletonLoaderMain from "./SkeletonLoaderMain";
+import SkeletonLoaderSearch from "./SkeletonLoaderSearch";
 
 interface VideoTranscriptSyncProps {
   videoId: string;
@@ -33,15 +27,15 @@ const VideoTranscriptSync: React.FC<VideoTranscriptSyncProps> = ({
   videoId,
 }) => {
   const [activeIndex, setActiveIndex] = useState<number>(-1);
+  const [isPlayerLoaded, setIsPlayerLoaded] = useState<boolean>(false);
   const playerRef = useRef<YT.Player | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const [transcript, setTranscript] =
     useState<SpeechmaticsBatchResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
-  let refreshKey;
   useEffect(() => {
     const getTranscript = async () => {
       setIsLoading(true);
@@ -51,21 +45,27 @@ const VideoTranscriptSync: React.FC<VideoTranscriptSyncProps> = ({
         );
         if (response.success) {
           setTranscript(response.data.transcript);
+        } else {
+          setIsError(true);
         }
-        setIsLoading(false);
       } catch {
         setIsError(true);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     if (videoId) getTranscript();
-  }, [videoId, refreshKey]);
+  }, [videoId]);
 
-  const words = useMemo(() => {
-    return transcript ? simplifyTranscript(transcript) : [];
-  }, [transcript]);
+  const words = useMemo(
+    () => (transcript ? simplifyTranscript(transcript) : []),
+    [transcript],
+  );
+  const turns = useMemo(() => formatTranscript(words), [words]);
 
-  // ====== SYNC LOGIC ======
+  const showSkeleton = isLoading || !isPlayerLoaded;
+
   const startTracking = () => {
     if (intervalRef.current || !words) return;
     intervalRef.current = setInterval(() => {
@@ -86,13 +86,11 @@ const VideoTranscriptSync: React.FC<VideoTranscriptSyncProps> = ({
     }
   };
 
-  useEffect(() => {
-    return () => stopTracking();
-  }, []);
+  useEffect(() => () => stopTracking(), []);
 
-  // ====== YOUTUBE EVENTS ======
   const onReady: YouTubeProps["onReady"] = (event) => {
     playerRef.current = event.target;
+    setIsPlayerLoaded(true);
   };
 
   const onStateChange: YouTubeProps["onStateChange"] = (event) => {
@@ -102,8 +100,22 @@ const VideoTranscriptSync: React.FC<VideoTranscriptSyncProps> = ({
 
   const onWordClick = (wordStartTime: number) => {
     playerRef.current?.seekTo(wordStartTime, true);
-    if (playerRef.current) {
-      playerRef.current.playVideo();
+    playerRef.current?.playVideo();
+  };
+
+  const onRename = async (oldName: string, newName: string) => {
+    try {
+      const response = await fetch(`/api/transcript/${videoId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ oldName, newName }),
+      });
+      if (response.ok) {
+        const updatedData = await response.json();
+        setTranscript(updatedData);
+      }
+    } catch (err) {
+      console.error("Failed to rename speaker:", err);
     }
   };
 
@@ -113,37 +125,25 @@ const VideoTranscriptSync: React.FC<VideoTranscriptSyncProps> = ({
     playerVars: { autoplay: 0 },
   };
 
-  const turns = useMemo(() => formatTranscript(words), [words]);
-
-  const onRename = async (oldName: string, newName: string) => {
-    try {
-      const response = await fetch(`/api/transcript/${videoId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ oldName, newName }),
-      });
-
-      if (response.ok) {
-        const updatedData = await response.json();
-        // Option A: Update local state with the new JSON returned by the server
-        setTranscript(updatedData);
-
-        // Option B: If you prefer a fresh fetch, trigger your refreshKey
-        // setRefreshKey(prev => prev + 1);
-      }
-    } catch (err) {
-      console.error("Failed to rename speaker:", err);
-    }
-  };
-
   return (
     <Container maxWidth="xl" sx={{ py: 6 }}>
       <Stack spacing={6} alignItems="center">
-        {/* main dashboard container: Speaker List | Video | Transcript
-         */}
+        {isError && (
+          <Alert
+            severity="error"
+            variant="outlined"
+            sx={{ width: "100%", borderRadius: 3 }}
+          >
+            There was an error fetching the transcript for this video.
+          </Alert>
+        )}
+
+        {showSkeleton && !isError && <SkeletonLoaderMain />}
+
+        {/* ugly but necessary -> YouTube player needs to load/mount for this onReady to method to setIsPlayerLoaded(true), then, once the API content loads we switch off the skeleton loader and switch on the content */}
         <Box
           sx={{
-            display: "flex",
+            display: showSkeleton || isError ? "none" : "flex",
             flexDirection: { xs: "column", lg: "row" },
             alignItems: { xs: "center", lg: "flex-start" },
             justifyContent: "center",
@@ -151,22 +151,10 @@ const VideoTranscriptSync: React.FC<VideoTranscriptSyncProps> = ({
             width: "100%",
           }}
         >
-          {/* COLUMN 1: Speaker Tags (Scrollable) */}
-          {!isLoading && !isError && (
-            <Box
-              sx={{
-                width: { xs: "100%", lg: 280 },
-                flexShrink: 0,
-                display: "flex",
-                flexDirection: "column",
-                borderRadius: 3,
-              }}
-            >
-              <SpeakerTag onRename={onRename} turns={turns} />
-            </Box>
-          )}
+          <Box sx={{ width: { xs: "100%", lg: 280 }, flexShrink: 0 }}>
+            <SpeakerTag onRename={onRename} turns={turns} />
+          </Box>
 
-          {/* COLUMN 2: Video (Centerpiece) */}
           <Paper
             elevation={8}
             sx={{
@@ -174,7 +162,6 @@ const VideoTranscriptSync: React.FC<VideoTranscriptSyncProps> = ({
               overflow: "hidden",
               bgcolor: "common.black",
               lineHeight: 0,
-              flexShrink: 0,
             }}
           >
             <YouTube
@@ -185,43 +172,23 @@ const VideoTranscriptSync: React.FC<VideoTranscriptSyncProps> = ({
             />
           </Paper>
 
-          {/* COLUMN 3: Transcript showing current spoken word */}
           <Box sx={{ width: "100%", flex: 1, minWidth: { lg: 400 } }}>
-            {isLoading && (
-              <Skeleton
-                variant="rectangular"
-                height={390}
-                sx={{ borderRadius: 3, bgcolor: "action.hover" }}
-              />
-            )}
-
-            {isError && (
-              <Alert
-                severity="error"
-                variant="outlined"
-                sx={{ borderRadius: 3 }}
-              >
-                There was an error fetching the transcript for this video
-              </Alert>
-            )}
-
-            {!isLoading && !isError && (
-              <TranscriptView
-                turns={turns}
-                activeIndex={activeIndex}
-                onWordClick={onWordClick}
-              />
-            )}
+            <TranscriptView
+              turns={turns}
+              activeIndex={activeIndex}
+              onWordClick={onWordClick}
+            />
           </Box>
         </Box>
-
-        {/* word/phrase search */}
-        {!isLoading && !isError && (
-          <Box sx={{ width: "100%", maxWidth: 1100, pt: 1 }}>
-            <Divider sx={{ mb: 2 }} />
+        <Box sx={{ width: "100%", maxWidth: 1100, pt: 1 }}>
+          <Divider sx={{ mb: 2 }} />
+          {/* this loader keys off the same values but doesnt need the css display property to work */}
+          {showSkeleton ? (
+            <SkeletonLoaderSearch />
+          ) : (
             <TranscriptSearch turns={turns} onWordClick={onWordClick} />
-          </Box>
-        )}
+          )}
+        </Box>
       </Stack>
     </Container>
   );

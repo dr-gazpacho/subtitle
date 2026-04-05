@@ -44,10 +44,16 @@ export const genericFetch = async <T>(
 /**
  * maps through speechmatics transcript, simplifies dataset
  * @param data Speechmatics transcript
- * @returns simplfied dataset that contains speaker name, timestamps, and word
+ * @returns simplified dataset that contains speaker name, timestamps, and word
  */
-export const simplifyTranscript = (data: SpeechmaticsBatchResponse | null) => {
-  if (!data) return null;
+export const simplifyTranscript = (
+  data: SpeechmaticsBatchResponse | null,
+): SimplifiedTranscript[] => {
+  // data is null or results doesn't exist, return empty array
+  if (!data || !Array.isArray(data.results)) {
+    console.warn("simplifyTranscript: Data is null or missing results array.");
+    return [];
+  }
 
   const words: SimplifiedTranscript[] = [];
   const results = data.results;
@@ -56,7 +62,7 @@ export const simplifyTranscript = (data: SpeechmaticsBatchResponse | null) => {
     const item = results[i];
 
     if (item.type === "word") {
-      let content = item.alternatives[0].content; // brittle but will work for the dataset- hypothetical do to is nested loop and extract "highest confidence" result
+      let content = item.alternatives[0].content; // brittle but will work for the dataset - hypothetical do to is nested loop and extract "highest confidence" result
 
       // need to look ahead to identify if the next item is punctuation and then attach it to the previous word
       const nextItem = results[i + 1];
@@ -73,6 +79,7 @@ export const simplifyTranscript = (data: SpeechmaticsBatchResponse | null) => {
       });
     }
   }
+
   return words;
 };
 
