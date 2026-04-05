@@ -12,7 +12,7 @@ import {
 
 describe("simplifyTranscript()", () => {
   it("should return null if data is null", () => {
-    expect(simplifyTranscript(null)).toBeNull();
+    expect(simplifyTranscript(null)).toStrictEqual([]);
   });
 
   it("should attach punctuation to the previous word and skip the punctuation index", () => {
